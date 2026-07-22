@@ -61,8 +61,6 @@ export function useSignIn() {
 
     const sessionData = await sessionResponse.json();
 
-    console.log("Session Data", sessionData);
-
     setUserId(sessionData.id);
   }, []);
 

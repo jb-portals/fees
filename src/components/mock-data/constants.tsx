@@ -204,6 +204,27 @@ export const CATS = (college: string | undefined) => {
     ];
 };
 
+export const STATE_CATS = () => {
+  return [
+    {
+      value: "KARNATAKA",
+      option: "KARNATAKA",
+    },
+    {
+      value: "NON-KARNATAKA/CBSE/ICSE",
+      option: "NON-KARNATAKA/CBSE/ICSE",
+    },
+    {
+      value: "INDIAN",
+      option: "INDIAN",
+    },
+    {
+      value: "FORIEGN",
+      option: "FORIEGN",
+    },
+  ];
+};
+
 export const PAYMENTMODES = (college: string | undefined) => {
   if (college == "KSSEM")
     return [

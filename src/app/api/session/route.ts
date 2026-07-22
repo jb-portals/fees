@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     response,
     sessionOptions
   );
-  console.log("\n\n\nSession data of GET request", session, "\n\n\n");
+  
   if (!session.id) {
     return NextResponse.json({ isLoggedIn: false }, { status: 401 });
   }
@@ -30,8 +30,6 @@ export async function POST(request: NextRequest) {
   session.id = input.id;
 
   await session.save();
-
-  console.log("Session stored", session);
 
   return response;
 }

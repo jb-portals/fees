@@ -16,7 +16,7 @@ import { useCallback } from "react";
 import axios from "axios";
 import { useAppDispatch } from "@/hooks";
 import { fetchFeeDetails } from "@/store/fees.slice";
-import { SEMS } from "../mock-data/constants";
+import { CATS, SEMS, STATE_CATS } from "../mock-data/constants";
 import { useUser } from "@/utils/auth";
 import { toaster } from "../ui/toaster";
 
@@ -34,6 +34,7 @@ const initialState = {
   category: "",
   student_college: "",
   college: "",
+  state_category: "",
 };
 
 const Schema = Yup.object().shape({
@@ -45,7 +46,8 @@ const Schema = Yup.object().shape({
     .max(10, "Phone number can't be exceed more than 10 digits")
     .optional(),
   sem: Yup.string().required("Sem is required"),
-  category: Yup.string().required("Year is required"),
+  category: Yup.string().required("Category is required"),
+  state_category: Yup.string().required("State category is required"),
   college: Yup.string(),
   student_college: Yup.string().when("college", ([college], sch) => {
     return college == "HOSTEL"
@@ -56,49 +58,16 @@ const Schema = Yup.object().shape({
   total: Yup.number().required().min(0).typeError("invalid number"),
 });
 
-const Categories = [
-  {
-    value: "SNQ",
-    option: "SNQ",
-  },
-  {
-    value: "MANAGEMENT",
-    option: "MANAGEMENT",
-  },
-  {
-    value: "COMEDK",
-    option: "COMEDK",
-  },
-  {
-    value: "GM",
-    option: "GM",
-  },
-  {
-    value: "SC",
-    option: "SC",
-  },
-  {
-    value: "ST",
-    option: "ST",
-  },
-  {
-    value: "CAT-I",
-    option: "CAT-I",
-  },
-  {
-    value: "DIP-LE",
-    option: "DIP-LE",
-  },
-];
-
 export default function AddStudentsDetails({ children }: props) {
   const { open, onClose, onOpen } = useDisclosure();
   const branch_list = useAppSelector(
-    (state) => state.fees.branch_list.data
+    (state) => state.fees.branch_list.data,
   ) as [];
   const user = useUser();
   const dispatch = useAppDispatch();
   const acadYear = useAppSelector((state) => state.fees.acadYear);
+  const Categories = CATS(user?.college);
+  const stateCategories = STATE_CATS();
 
   const {
     errors,
@@ -125,6 +94,7 @@ export default function AddStudentsDetails({ children }: props) {
         formData.append("name", values.name);
         formData.append("phone", values.phone);
         formData.append("category", values.category);
+        formData.append("state_category", values.state_category);
         formData.append("sem", values.sem);
         formData.append("branch", values.branch);
         formData.append("total_fee", values.total);
@@ -136,7 +106,7 @@ export default function AddStudentsDetails({ children }: props) {
           {
             method: "POST",
             data: formData,
-          }
+          },
         );
 
         toaster.success({ title: "Student Added successfully" });
@@ -146,15 +116,14 @@ export default function AddStudentsDetails({ children }: props) {
             branch: values.branch,
             year: values.sem,
             college: user?.college!,
-          })
+          }),
         );
         onClose();
       } catch (e: any) {
-        console.log("error occurs while adding the student", e);
         toaster.error({ title: e.response.data.msg });
       }
     },
-    [user?.college, toaster]
+    [user?.college, toaster],
   );
 
   return (
@@ -303,9 +272,41 @@ export default function AddStudentsDetails({ children }: props) {
                     </option>
                   ))}
                 </NativeSelect.Field>
+                <NativeSelect.Indicator />
               </NativeSelect.Root>
               <Field.ErrorText>{errors.category}</Field.ErrorText>
             </Field.Root>
+
+            {user?.college === "KSDC" && (
+              <Field.Root
+                invalid={
+                  !!errors.state_category?.length && touched.state_category
+                }
+                px={"5"}
+              >
+                <Field.Label flex={1}>
+                  <Text>State Category</Text>
+                </Field.Label>
+                <NativeSelect.Root>
+                  <NativeSelect.Indicator />
+                  <NativeSelect.Field
+                    name="state_category"
+                    value={values.state_category}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  >
+                    <option value={""}>Select State Category</option>
+                    {stateCategories.map((category) => (
+                      <option key={category.value} value={category.value}>
+                        {category.value}
+                      </option>
+                    ))}
+                  </NativeSelect.Field>
+                  <NativeSelect.Indicator />
+                </NativeSelect.Root>
+                <Field.ErrorText>{errors.state_category}</Field.ErrorText>
+              </Field.Root>
+            )}
 
             <Field.Root
               invalid={!!errors.total?.length && touched.total}

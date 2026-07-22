@@ -29,7 +29,7 @@ import {
   fetchSelectedFeeSearchDetails,
 } from "@/store/fees.slice";
 import { useAppDispatch } from "@/hooks";
-import { CATS, SEMS } from "../mock-data/constants";
+import { CATS, SEMS, STATE_CATS } from "../mock-data/constants";
 import IModal from "../ui/utils/IModal";
 import moment from "moment";
 import { useUser } from "@/utils/auth";
@@ -61,6 +61,7 @@ type FormikState = {
   paid: number;
   remaining: number;
   category: string;
+  state_category: string;
 };
 
 let initialState: FormikState = {
@@ -75,6 +76,7 @@ let initialState: FormikState = {
   paid: 0,
   remaining: 0,
   category: "",
+  state_category: "",
 };
 
 export default function ViewStudentsDetails({
@@ -87,7 +89,7 @@ export default function ViewStudentsDetails({
   children: ({ onOpen }: { onOpen: () => void }) => JSX.Element;
 }) {
   const branch_list = useAppSelector(
-    (state) => state.fees.branch_list.data
+    (state) => state.fees.branch_list.data,
   ) as [];
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -124,12 +126,12 @@ export default function ViewStudentsDetails({
   const user = useUser();
 
   const Categories = CATS(user?.college);
+  const stateCategories = STATE_CATS()
 
   useEffect(() => {
-    console.log(id);
     if (id && open && user?.college) {
       dispatch(
-        fetchSelectedFeeSearchDetails({ id, regno, college: user?.college! })
+        fetchSelectedFeeSearchDetails({ id, regno, college: user?.college! }),
       );
     }
   }, [id, open, regno, dispatch, user?.college]);
@@ -147,6 +149,7 @@ export default function ViewStudentsDetails({
           branch: data[0]?.branch ?? "",
           total: data[0]?.total ?? "",
           category: data[0]?.category ?? "",
+          state_category: data[0]?.state_category ?? "",
           status: data[0]?.status ?? "",
           paid: data[0]?.paid ?? "",
           remaining: data[0]?.remaining ?? 0,
@@ -162,7 +165,7 @@ export default function ViewStudentsDetails({
   function changeStateValue() {
     setFieldValue(
       "remaining",
-      parseInt(values.total.toString()) - parseInt(values.paid.toString())
+      parseInt(values.total.toString()) - parseInt(values.paid.toString()),
     );
     if (values.total == values.paid) setFieldValue("status", "FULLY PAID");
     else if (values.paid < values.total && values.paid > 0)
@@ -183,6 +186,7 @@ export default function ViewStudentsDetails({
       formData.append("name", values.name);
       formData.append("phone", values.phone);
       formData.append("category", values.category);
+      formData.append("state_category", values.state_category);
       formData.append("sem", values.sem);
       formData.append("branch", values.branch);
       formData.append("college", user?.college!);
@@ -196,7 +200,7 @@ export default function ViewStudentsDetails({
         {
           method: "POST",
           data: formData,
-        }
+        },
       );
       if (!response || response.status !== 201)
         throw Error("Something went wrong !");
@@ -206,12 +210,11 @@ export default function ViewStudentsDetails({
           branch: values.branch,
           year: data[0].year,
           college: user?.college!,
-        })
+        }),
       );
       router.refresh();
       onClose();
     } catch (e: any) {
-      console.log(e);
       toaster.error({ title: e.response.data?.msg });
     }
   };
@@ -229,7 +232,7 @@ export default function ViewStudentsDetails({
         {
           method: "POST",
           data: formData,
-        }
+        },
       );
       if (!response || response.status !== 201)
         throw Error("Something went wrong !");
@@ -239,7 +242,7 @@ export default function ViewStudentsDetails({
           branch: values.branch,
           year: data[0].year,
           college: user?.college!,
-        })
+        }),
       );
       router.refresh();
       onClose();
@@ -279,13 +282,15 @@ export default function ViewStudentsDetails({
       formData.append("tid", tid);
       formData.append("date", moment(date).format("DD-MM-yyyy"));
       formData.append("acadYear", acadYear);
+      formData.append("state_category", values.state_category);
+      formData.append("category", values.category);
 
       const response = await axios(
         process.env.NEXT_PUBLIC_ADMIN_URL + "studentupdatefee.php",
         {
           method: "POST",
           data: formData,
-        }
+        },
       );
       if (!response || response.status !== 201)
         throw Error("Something went wrong !");
@@ -295,7 +300,7 @@ export default function ViewStudentsDetails({
           branch: values.branch,
           year: data[0].year,
           college: user?.college!,
-        })
+        }),
       );
       router.refresh();
       onPaymentClose();
@@ -558,9 +563,41 @@ export default function ViewStudentsDetails({
                       </option>
                     ))}
                   </NativeSelect.Field>
+                      <NativeSelect.Indicator />
                 </NativeSelect.Root>
                 <Field.ErrorText>{errors.category}</Field.ErrorText>
               </Field.Root>
+
+              { data[0]?.college === "KSDC" && (
+                <Field.Root
+                  invalid={!!errors.state_category?.length && touched.state_category}
+                  px={"5"}
+                >
+                  <Field.Label flex={1}>
+                    <Text>State Category</Text>
+                  </Field.Label>
+                  <NativeSelect.Root>
+                    <NativeSelect.Field
+                      name="state_category"
+                      value={values.state_category}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    >
+                      <option value={""}>Select State Category</option>
+                      {stateCategories.map((category, key) => (
+                        <option
+                          key={category.value + key}
+                          value={category.value}
+                        >
+                          {category.option}
+                        </option>
+                      ))}
+                    </NativeSelect.Field>
+                      <NativeSelect.Indicator />
+                  </NativeSelect.Root>
+                  <Field.ErrorText>{errors.state_category}</Field.ErrorText>
+                </Field.Root>
+              )}
 
               <Field.Root
                 invalid={!!errors.total?.length && touched.total}

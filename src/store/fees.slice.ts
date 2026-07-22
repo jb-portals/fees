@@ -564,6 +564,7 @@ export interface Fee {
   remaining: number;
   status: "FULLY PAID" | "PARTIALLY PAID" | "NOT PAID";
   category: string;
+  state_category?: string;
   sem: string;
   college: string;
 }

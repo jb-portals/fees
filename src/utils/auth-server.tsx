@@ -8,8 +8,6 @@ import { cookies } from "next/headers";
 export async function auth() {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
 
-  console.log("session get", session);
-
   if (!session.id) return { isLoggedIn: false, user: null };
   const user = await api.getUser(session.id ?? "");
   return {
