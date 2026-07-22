@@ -318,3 +318,35 @@ export const ACADYEARS = () => {
     },
   ];
 };
+
+/** KSDC-only fee breakdown for challan generation */
+export const KSDC_FEE_FIELDS = [
+  { name: "reg_fee", label: "Registration Fee" },
+  { name: "admission_fee", label: "Admission Fee" },
+  { name: "sports_fee", label: "Sports Fee" },
+  { name: "processing_fee", label: "Processing Fee" },
+  { name: "cultural_fee", label: "Cultural Activity Fee" },
+  { name: "eligibility_fee", label: "Eligibility Fee" },
+  { name: "tuition_fee", label: "Tuition Fee" },
+] as const;
+
+export const KSDC_FEE_INITIAL = {
+  reg_fee: 0,
+  admission_fee: 0,
+  sports_fee: 0,
+  processing_fee: 0,
+  cultural_fee: 0,
+  eligibility_fee: 0,
+  tuition_fee: 0,
+};
+
+export const sumKsdcFees = (values: typeof KSDC_FEE_INITIAL) =>
+  +(
+    +values.reg_fee +
+    +values.admission_fee +
+    +values.sports_fee +
+    +values.processing_fee +
+    +values.cultural_fee +
+    +values.eligibility_fee +
+    +values.tuition_fee
+  );

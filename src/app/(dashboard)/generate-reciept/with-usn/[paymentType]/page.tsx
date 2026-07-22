@@ -33,8 +33,11 @@ import {
   ACADYEARS,
   BANKS,
   CATS,
+  KSDC_FEE_FIELDS,
+  KSDC_FEE_INITIAL,
   PAYMENTMODES,
   SEMS,
+  sumKsdcFees,
 } from "@/components/mock-data/constants";
 import { useAppSelector } from "@/store";
 import { trpc } from "@/utils/trpc-cleint";
@@ -67,6 +70,7 @@ const initialValues = {
   collegeFee: 0, //✅
   labFee: 0, //✅
   vtuFee: 0, //✅
+  ...KSDC_FEE_INITIAL,
   bank: "", //✅
   paymentMode: "", //✅
   date: moment(new Date(Date.now())).format("yyyy-MM-DD"), //✅
@@ -97,7 +101,7 @@ const FormikContextProvider = () => {
     },
     {
       enabled: !!challan_id,
-    }
+    },
   );
 
   useEffect(() => {
@@ -122,10 +126,21 @@ const FormikContextProvider = () => {
       setFieldValue("paymentMode", data[0]?.method);
       setFieldValue("chequeNo", data[0]?.trans_id);
       setFieldValue("date", data[0]?.trans_date);
+      setFieldValue("reg_fee", data[0]?.reg_fee ?? 0);
+      setFieldValue("admission_fee", data[0]?.admission_fee ?? 0);
+      setFieldValue("sports_fee", data[0]?.sports_fee ?? 0);
+      setFieldValue("processing_fee", data[0]?.processing_fee ?? 0);
+      setFieldValue("cultural_fee", data[0]?.cultural_fee ?? 0);
+      setFieldValue("eligibility_fee", data[0]?.eligibility_fee ?? 0);
+      setFieldValue("tuition_fee", data[0]?.tuition_fee ?? 0);
     }
   }, [data, challan_id]);
 
   useEffect(() => {
+    if (user?.college === "KSDC") {
+      setFieldValue("total", sumKsdcFees(values));
+      return;
+    }
     setFieldValue(
       "total",
       +(
@@ -134,14 +149,22 @@ const FormikContextProvider = () => {
         +values.vtuFee +
         +values.labFee +
         +values.excessFee
-      )
+      ),
     );
   }, [
+    user?.college,
     values.collegeFee,
     values.tuitionFee,
     values.vtuFee,
     values.labFee,
     values.excessFee,
+    values.reg_fee,
+    values.admission_fee,
+    values.sports_fee,
+    values.processing_fee,
+    values.cultural_fee,
+    values.eligibility_fee,
+    values.tuition_fee,
     setFieldValue,
   ]);
 
@@ -157,7 +180,7 @@ const FormikContextProvider = () => {
         {
           method: "POST",
           data: formData,
-        }
+        },
       );
 
       if (res.status !== 402) {
@@ -169,6 +192,15 @@ const FormikContextProvider = () => {
         setFieldValue("category", res.data[0]?.category);
         setFieldValue("total_fee", res.data[0]?.total_fee);
         setFieldValue("remaining_fee", res.data[0]?.remaining_fee);
+        if (user?.college === "KSDC") {
+          setFieldValue("reg_fee", res.data[0]?.reg_fee ?? 0);
+          setFieldValue("admission_fee", res.data[0]?.admission_fee ?? 0);
+          setFieldValue("sports_fee", res.data[0]?.sports_fee ?? 0);
+          setFieldValue("processing_fee", res.data[0]?.processing_fee ?? 0);
+          setFieldValue("cultural_fee", res.data[0]?.cultural_fee ?? 0);
+          setFieldValue("eligibility_fee", res.data[0]?.eligibility_fee ?? 0);
+          setFieldValue("tuition_fee", res.data[0]?.tuition_fee ?? 0);
+        }
       }
     } catch (e: any) {
       toaster.create({ title: e.response.data?.msg, type: "error" });
@@ -224,7 +256,7 @@ export default function WithUSNDynamicPage() {
     },
     {
       enabled: !!challan_id,
-    }
+    },
   );
 
   const { open, onToggle, onOpen } = useDisclosure();
@@ -267,7 +299,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -325,7 +357,7 @@ export default function WithUSNDynamicPage() {
         .typeError("invalid number")
         .min(0, "minimum amount should be 0")
         .when((_, schema, __) =>
-          challan_id ? schema.optional() : schema.required("Field required !")
+          challan_id ? schema.optional() : schema.required("Field required !"),
         ),
     },
     {
@@ -338,64 +370,76 @@ export default function WithUSNDynamicPage() {
         .typeError("invalid number")
         .min(0, "minimum amount should be 0")
         .when((_, schema, __) =>
-          challan_id ? schema.optional() : schema.required("Field required !")
+          challan_id ? schema.optional() : schema.required("Field required !"),
         ),
     },
-    {
-      name: "tuitionFee",
-      label: "Tuition Fee",
-      type: "text",
-      validateField: Yup.number()
-        .typeError("invalid number")
-        .required("Field required !")
-        .min(0, "minimum amount should be 0"),
-    },
-    {
-      name: "vtuFee",
-      label:
-        user?.college == "KSPT"
-          ? "Admission Fee"
-          : user?.college == "KSPU"
-          ? "PU Board Fee"
-          : "VTU/DTE/DDPI/GP.INS/ IRC Fee",
-      type: "text",
-      validateField: Yup.number()
-        .typeError("invalid number")
-        .required("Field required !")
-        .min(0, "minimum amount should be 0"),
-    },
-    {
-      name: "collegeFee",
-      label: "College & Other Fee",
-      type: "text",
-      validateField: Yup.number()
-        .typeError("invalid number")
-        .required("Field required !")
-        .min(0, "minimum amount should be 0"),
-    },
-    {
-      name: "labFee",
-      label:
-        user?.college == "KSPT"
-          ? "Development Fee"
-          : user?.college == "KSPU"
-          ? "Exam Fee"
-          : "Skill Lab Fee",
-      type: "text",
-      validateField: Yup.number()
-        .typeError("invalid number")
-        .required("Field required !")
-        .min(0, "minimum amount should be 0"),
-    },
-    {
-      name: "excessFee",
-      label: "Excess Fee",
-      type: "text",
-      validateField: Yup.number()
-        .typeError("invalid number")
-        .required("Field required !")
-        .min(0, "minimum amount should be 0"),
-    },
+    ...(user?.college === "KSDC"
+      ? KSDC_FEE_FIELDS.map(({ name, label }) => ({
+          name,
+          label,
+          type: "text" as const,
+          validateField: Yup.number()
+            .typeError("invalid number")
+            .required("Field required !")
+            .min(0, "minimum amount should be 0"),
+        }))
+      : [
+          {
+            name: "tuitionFee",
+            label: "Tuition Fee",
+            type: "text" as const,
+            validateField: Yup.number()
+              .typeError("invalid number")
+              .required("Field required !")
+              .min(0, "minimum amount should be 0"),
+          },
+          {
+            name: "vtuFee",
+            label:
+              user?.college == "KSPT"
+                ? "Admission Fee"
+                : user?.college == "KSPU"
+                  ? "PU Board Fee"
+                  : "VTU/DTE/DDPI/GP.INS/ IRC Fee",
+            type: "text" as const,
+            validateField: Yup.number()
+              .typeError("invalid number")
+              .required("Field required !")
+              .min(0, "minimum amount should be 0"),
+          },
+          {
+            name: "collegeFee",
+            label: "College & Other Fee",
+            type: "text" as const,
+            validateField: Yup.number()
+              .typeError("invalid number")
+              .required("Field required !")
+              .min(0, "minimum amount should be 0"),
+          },
+          {
+            name: "labFee",
+            label:
+              user?.college == "KSPT"
+                ? "Development Fee"
+                : user?.college == "KSPU"
+                  ? "Exam Fee"
+                  : "Skill Lab Fee",
+            type: "text" as const,
+            validateField: Yup.number()
+              .typeError("invalid number")
+              .required("Field required !")
+              .min(0, "minimum amount should be 0"),
+          },
+          {
+            name: "excessFee",
+            label: "Excess Fee",
+            type: "text" as const,
+            validateField: Yup.number()
+              .typeError("invalid number")
+              .required("Field required !")
+              .min(0, "minimum amount should be 0"),
+          },
+        ]),
     {
       name: "total",
       label: "Total Fee",
@@ -434,7 +478,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -509,7 +553,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -638,7 +682,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -713,7 +757,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -788,7 +832,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -863,7 +907,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -938,7 +982,7 @@ export default function WithUSNDynamicPage() {
         .required("Field required !")
         .matches(
           /^[Aa-zZ0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -1012,7 +1056,7 @@ export default function WithUSNDynamicPage() {
         .required("Fill the field!")
         .matches(
           /^[a-z0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -1045,7 +1089,7 @@ export default function WithUSNDynamicPage() {
         .required("Fill the field!")
         .matches(
           /^[a-z0-9,]+$/i,
-          "Only [a-z],[0-9] or `,` are allowed for this field"
+          "Only [a-z],[0-9] or `,` are allowed for this field",
         ),
     },
     {
@@ -1067,7 +1111,7 @@ export default function WithUSNDynamicPage() {
         .required("Fill the field!")
         .matches(
           /^[a-z0-9]+$/i,
-          "Only alphanumaric values are allowed for this field"
+          "Only alphanumaric values are allowed for this field",
         ),
     },
     {
@@ -1080,20 +1124,29 @@ export default function WithUSNDynamicPage() {
     },
   ];
 
+  const getKSDCFilename = (state: typeof initialValues) => {
+    if (state.paymentMode == "ONLINE") {
+      return "feeksdcgenerateonline.php";
+    }
+    return "feeksdcgeneratereceipt.php";
+  };
+
   async function generateReciept(state: typeof initialValues) {
     try {
       const filename =
-        state.paymentMode == "ONLINE" &&
-        paymentType !== "MISCELLANEOUS" &&
-        user?.college !== "KSPT"
-          ? "feegenerateonlinewithusn.php"
-          : paymentType == "MISCELLANEOUS"
-          ? "feegeneratemiscellaneouswithusn.php"
-          : paymentType == "OTHERS"
-          ? "feegeneratefine.php"
-          : user?.college == "KSPT" || user?.college == "KSSA"
-          ? "feekspreceipt.php"
-          : "feegeneraterecieptwithusn.php";
+        user?.college === "KSDC" && paymentType == "FEE"
+          ? getKSDCFilename(state)
+          : state.paymentMode == "ONLINE" &&
+              paymentType !== "MISCELLANEOUS" &&
+              user?.college !== "KSPT"
+            ? "feegenerateonlinewithusn.php"
+            : paymentType == "MISCELLANEOUS"
+              ? "feegeneratemiscellaneouswithusn.php"
+              : paymentType == "OTHERS"
+                ? "feegeneratefine.php"
+                : user?.college == "KSPT" || user?.college == "KSSA"
+                  ? "feekspreceipt.php"
+                  : "feegeneraterecieptwithusn.php";
 
       const response = await axios.get(
         process.env.NEXT_PUBLIC_ADMIN_URL +
@@ -1104,11 +1157,11 @@ export default function WithUSNDynamicPage() {
                   key == "date"
                     ? moment(state[key]).format("yyyy-MM-DD")
                     : Object.values(state)[index]
-                }`
+                }`,
             )
             .join("&")}&paymentType=${paymentType}&college=${
             user?.college
-          }&mutable=${isMutable}`
+          }&mutable=${isMutable}`,
       );
 
       if (response.status == 402) return new Error(response.data.msg);
@@ -1122,12 +1175,12 @@ export default function WithUSNDynamicPage() {
                   key == "date"
                     ? moment(state[key]).format("yyyy-MM-DD")
                     : Object.values(state)[index]
-                }`
+                }`,
             )
             .join("&")}&paymentType=${paymentType}&college=${
             user?.college
           }&mutable=${isMutable}`,
-        "_blank"
+        "_blank",
       );
     } catch (e: any) {
       toaster.error({
@@ -1161,13 +1214,22 @@ export default function WithUSNDynamicPage() {
       formData.append("excess", state.excessFee.toString());
       formData.append("security_deposit", state.securityDeposit.toString());
       formData.append("hostel", state.hostelFee.toString());
+      if (user?.college === "KSDC") {
+        formData.append("reg_fee", state.reg_fee.toString());
+        formData.append("admission_fee", state.admission_fee.toString());
+        formData.append("sports_fee", state.sports_fee.toString());
+        formData.append("processing_fee", state.processing_fee.toString());
+        formData.append("cultural_fee", state.cultural_fee.toString());
+        formData.append("eligibility_fee", state.eligibility_fee.toString());
+        formData.append("tuition_fee", state.tuition_fee.toString());
+      }
       formData.append("amount_paid", state.total.toString());
       formData.append("acad_year", state.chaAcadYear);
       formData.append("linked", data[0].linked);
 
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ADMIN_URL + `feechallanupdate.php`,
-        formData
+        formData,
       );
 
       if (response.status == 402) return new Error(response.data.msg);
@@ -1189,7 +1251,7 @@ export default function WithUSNDynamicPage() {
 
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ADMIN_URL + `feedeletechallan.php`,
-        formData
+        formData,
       );
 
       if (response.status == 402) return new Error(response.data.msg);
@@ -1230,33 +1292,33 @@ export default function WithUSNDynamicPage() {
             paymentMode == "CHEQUE"
               ? chequeTemplate
               : paymentMode == "CASH"
-              ? cashTemplate
-              : paymentMode == "ONLINE"
-              ? onlineTemplate
-              : paymentMode == "UPI SCAN"
-              ? onlineTemplate
-              : paymentMode == "DD"
-              ? ddTemplate
-              : undefined;
+                ? cashTemplate
+                : paymentMode == "ONLINE"
+                  ? onlineTemplate
+                  : paymentMode == "UPI SCAN"
+                    ? onlineTemplate
+                    : paymentMode == "DD"
+                      ? ddTemplate
+                      : undefined;
 
           const checkOnPaymentType =
             paymentType == "FEE"
               ? feeTemplate
               : paymentType == "MISCELLANEOUS"
-              ? miscellaneousTemplate
-              : paymentType == "OTHERS"
-              ? fineTemplate
-              : paymentType == "BUS_FEE"
-              ? busFeeTemplate
-              : paymentType == "EXCESS_FEE"
-              ? excessFeeTemplate
-              : paymentType == "SECURITY_DEPOSIT"
-              ? securityFeeTemplate
-              : paymentType == "HOSTEL_FEE"
-              ? hostelFeeTemplate
-              : paymentType == "REGISTRATION_FEE"
-              ? registrationFeeTemplate
-              : undefined;
+                ? miscellaneousTemplate
+                : paymentType == "OTHERS"
+                  ? fineTemplate
+                  : paymentType == "BUS_FEE"
+                    ? busFeeTemplate
+                    : paymentType == "EXCESS_FEE"
+                      ? excessFeeTemplate
+                      : paymentType == "SECURITY_DEPOSIT"
+                        ? securityFeeTemplate
+                        : paymentType == "HOSTEL_FEE"
+                          ? hostelFeeTemplate
+                          : paymentType == "REGISTRATION_FEE"
+                            ? registrationFeeTemplate
+                            : undefined;
 
           return (
             <React.Fragment>
@@ -1379,7 +1441,7 @@ export default function WithUSNDynamicPage() {
                           value="download-reciept"
                           onClick={() => {
                             window.open(
-                              `${process.env.NEXT_PUBLIC_ADMIN_URL}feedownloadreciept.php?challan_id=${challan_id}&acadyear=${acadYear}&college=${user?.college}`
+                              `${process.env.NEXT_PUBLIC_ADMIN_URL}feedownloadreciept.php?challan_id=${challan_id}&acadyear=${acadYear}&college=${user?.college}`,
                             );
                           }}
                         >
