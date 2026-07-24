@@ -37,26 +37,30 @@ const initialState = {
   state_category: "",
 };
 
-const Schema = Yup.object().shape({
-  usn: Yup.string().required(),
-  name: Yup.string().required().min(2),
-  phone: Yup.string()
-    .required()
-    .min(10, "Phone number should be 10 digits")
-    .max(10, "Phone number can't be exceed more than 10 digits")
-    .optional(),
-  sem: Yup.string().required("Sem is required"),
-  category: Yup.string().required("Category is required"),
-  state_category: Yup.string().required("State category is required"),
-  college: Yup.string(),
-  student_college: Yup.string().when("college", ([college], sch) => {
-    return college == "HOSTEL"
-      ? sch.required("College is required")
-      : sch.optional();
-  }),
-  branch: Yup.string().required("Branch is required"),
-  total: Yup.number().required().min(0).typeError("invalid number"),
-});
+const getSchema = (college?: string) =>
+  Yup.object().shape({
+    usn: Yup.string().required(),
+    name: Yup.string().required().min(2),
+    phone: Yup.string()
+      .required()
+      .min(10, "Phone number should be 10 digits")
+      .max(10, "Phone number can't be exceed more than 10 digits")
+      .optional(),
+    sem: Yup.string().required("Sem is required"),
+    category: Yup.string().required("Category is required"),
+    state_category:
+      college === "KSDC"
+        ? Yup.string().required("State category is required")
+        : Yup.string().optional(),
+    college: Yup.string(),
+    student_college: Yup.string().when("college", ([college], sch) => {
+      return college == "HOSTEL"
+        ? sch.required("College is required")
+        : sch.optional();
+    }),
+    branch: Yup.string().required("Branch is required"),
+    total: Yup.number().required().min(0).typeError("invalid number"),
+  });
 
 export default function AddStudentsDetails({ children }: props) {
   const { open, onClose, onOpen } = useDisclosure();
@@ -83,7 +87,7 @@ export default function AddStudentsDetails({ children }: props) {
   } = useFormik({
     initialValues: initialState,
     onSubmit: async (values) => await addStudent(values),
-    validationSchema: Schema,
+    validationSchema: getSchema(user?.college),
   });
 
   const addStudent = useCallback(

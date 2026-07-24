@@ -35,19 +35,24 @@ import moment from "moment";
 import { useUser } from "@/utils/auth";
 import { toaster } from "../ui/toaster";
 
-const Schema = Yup.object().shape({
-  name: Yup.string().required().min(2),
-  phone: Yup.string()
-    .required()
-    .min(10, "Phone number should be 10 digits")
-    .max(10, "Phone number can't be exceed more than 10 digits")
-    .optional(),
-  sem: Yup.string().required("Sem is required"),
-  category: Yup.string().required("Year is required"),
-  branch: Yup.string().required("Branch is required"),
-  total: Yup.number().required().min(0).typeError("invalid number"),
-  paid: Yup.number().required().min(0).typeError("invalid number"),
-});
+const getSchema = (college?: string) =>
+  Yup.object().shape({
+    name: Yup.string().required().min(2),
+    phone: Yup.string()
+      .required()
+      .min(10, "Phone number should be 10 digits")
+      .max(10, "Phone number can't be exceed more than 10 digits")
+      .optional(),
+    sem: Yup.string().required("Sem is required"),
+    category: Yup.string().required("Year is required"),
+    state_category:
+      college === "KSDC"
+        ? Yup.string().required("State category is required")
+        : Yup.string().optional(),
+    branch: Yup.string().required("Branch is required"),
+    total: Yup.number().required().min(0).typeError("invalid number"),
+    paid: Yup.number().required().min(0).typeError("invalid number"),
+  });
 
 type FormikState = {
   id: string;
@@ -97,6 +102,7 @@ export default function ViewStudentsDetails({
   const pending = useAppSelector((state) => state.fees.selected_fee.pending);
   const router = useRouter();
   const acadYear = useAppSelector((state) => state.fees.acadYear);
+  const user = useUser();
   const {
     errors,
     touched,
@@ -111,7 +117,7 @@ export default function ViewStudentsDetails({
   } = useFormik<FormikState>({
     initialValues: initialState,
     onSubmit: async () => await updateStudent(),
-    validationSchema: Schema,
+    validationSchema: getSchema(user?.college),
     enableReinitialize: true,
     initialStatus: "Loading",
   });
@@ -123,10 +129,9 @@ export default function ViewStudentsDetails({
     open: isPaymentOpen,
     onClose: onPaymentClose,
   } = useDisclosure();
-  const user = useUser();
 
   const Categories = CATS(user?.college);
-  const stateCategories = STATE_CATS()
+  const stateCategories = STATE_CATS();
 
   useEffect(() => {
     if (id && open && user?.college) {
@@ -563,14 +568,16 @@ export default function ViewStudentsDetails({
                       </option>
                     ))}
                   </NativeSelect.Field>
-                      <NativeSelect.Indicator />
+                  <NativeSelect.Indicator />
                 </NativeSelect.Root>
                 <Field.ErrorText>{errors.category}</Field.ErrorText>
               </Field.Root>
 
-              { data[0]?.college === "KSDC" && (
+              {data[0]?.college === "KSDC" && (
                 <Field.Root
-                  invalid={!!errors.state_category?.length && touched.state_category}
+                  invalid={
+                    !!errors.state_category?.length && touched.state_category
+                  }
                   px={"5"}
                 >
                   <Field.Label flex={1}>
@@ -593,7 +600,7 @@ export default function ViewStudentsDetails({
                         </option>
                       ))}
                     </NativeSelect.Field>
-                      <NativeSelect.Indicator />
+                    <NativeSelect.Indicator />
                   </NativeSelect.Root>
                   <Field.ErrorText>{errors.state_category}</Field.ErrorText>
                 </Field.Root>
