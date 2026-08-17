@@ -1082,6 +1082,20 @@ export default function WithoutUSNDynamicPage() {
     return "feeksdcgeneratereceipt.php";
   };
 
+  const getCollegeDownloadUrl = (college: string) => {
+    if (college === "KSDC") {
+      return (
+        process.env.NEXT_PUBLIC_ADMIN_URL +
+        `feedownloadreceiptksdc.php?challan_id=${challan_id}&acadyear=${acadYear}&college=${college}`
+      );
+    }
+
+    return (
+      process.env.NEXT_PUBLIC_ADMIN_URL +
+      `feedownloadreciept.php?challan_id=${challan_id}&acadyear=${acadYear}&college=${college}`
+    );
+  };
+
   async function generateReciept(state: typeof initialValues) {
     try {
       const filename =
@@ -1387,9 +1401,7 @@ export default function WithoutUSNDynamicPage() {
                       <MenuItem
                         value="download-reciept"
                         onClick={() => {
-                          window.open(
-                            `${process.env.NEXT_PUBLIC_ADMIN_URL}feedownloadreciept.php?challan_id=${challan_id}&acadyear=${acadYear}&college=${user?.college}`,
-                          );
+                          window.open(getCollegeDownloadUrl(user?.college!));
                         }}
                       >
                         <AiOutlineFileText className="text-lg" />
