@@ -1204,79 +1204,85 @@ export default function WithUSNDynamicPage() {
   }
 
   async function updateReciept(state: typeof initialValues) {
-    try {
-      const formData = new FormData();
-      formData.append("challan_no", challan_id!);
-      formData.append("college", user?.college!);
-      formData.append("usn", state.usn);
-      formData.append("name", state.name);
-      formData.append("stu_category", state.category);
-      formData.append("sem", state.sem);
-      formData.append("year", state.year);
-      formData.append("branch", state.branch);
-      formData.append("bank", state.bank);
-      formData.append("method", state.paymentMode);
-      formData.append("type", paymentType);
-      formData.append("trans_id", state.chequeNo);
-      formData.append("trans_date", state.date);
-      formData.append("tuition", state.tuitionFee.toString());
-      formData.append("vtu", state.vtuFee.toString());
-      formData.append("college_fee", state.collegeFee.toString());
-      formData.append("tuition", state.tuitionFee.toString());
-      formData.append("lab", state.labFee.toString());
-      formData.append("bus", state.busFee.toString());
-      formData.append("excess", state.excessFee.toString());
-      formData.append("security_deposit", state.securityDeposit.toString());
-      formData.append("hostel", state.hostelFee.toString());
-      if (user?.college === "KSDC") {
-        formData.append("reg_fee", state.reg_fee.toString());
-        formData.append("admission_fee", state.admission_fee.toString());
-        formData.append("sports_fee", state.sports_fee.toString());
-        formData.append("processing_fee", state.processing_fee.toString());
-        formData.append("cultural_fee", state.cultural_fee.toString());
-        formData.append("eligibility_fee", state.eligibility_fee.toString());
-        formData.append("tuition_fee", state.tuition_fee.toString());
-      }
-      formData.append("amount_paid", state.total.toString());
-      formData.append("acad_year", state.chaAcadYear);
-      formData.append("linked", data[0].linked);
+    const formData = new FormData();
+    formData.append("challan_no", challan_id!);
+    formData.append("college", user?.college!);
+    formData.append("usn", state.usn);
+    formData.append("name", state.name);
+    formData.append("stu_category", state.category);
+    formData.append("sem", state.sem);
+    formData.append("year", state.year);
+    formData.append("branch", state.branch);
+    formData.append("bank", state.bank);
+    formData.append("method", state.paymentMode);
+    formData.append("type", paymentType);
+    formData.append("trans_id", state.chequeNo);
+    formData.append("trans_date", state.date);
+    formData.append("tuition", String(state.tuitionFee));
+    formData.append("vtu", String(state.vtuFee));
+    formData.append("college_fee", String(state.collegeFee));
+    formData.append("lab", String(state.labFee));
+    formData.append("bus", String(state.busFee));
+    formData.append("excess", String(state.excessFee));
+    formData.append("security_deposit", String(state.securityDeposit));
+    formData.append("hostel", String(state.hostelFee));
+    if (user?.college === "KSDC") {
+      formData.append("reg_fee", String(state.reg_fee));
+      formData.append("admission_fee", String(state.admission_fee));
+      formData.append("sports_fee", String(state.sports_fee));
+      formData.append("processing_fee", String(state.processing_fee));
+      formData.append("cultural_fee", String(state.cultural_fee));
+      formData.append("eligibility_fee", String(state.eligibility_fee));
+      formData.append("tuition_fee", String(state.tuition_fee));
+    }
+    formData.append("amount_paid", String(state.total));
+    formData.append("acad_year", state.chaAcadYear);
+    formData.append("linked", data[0].linked);
 
-      const response = await axios.post(
+    await axios
+      .post(
         process.env.NEXT_PUBLIC_ADMIN_URL + `feechallanupdate.php`,
         formData,
+      )
+      .then((response) => {
+        if (response.status == 200) {
+          toaster.info({ title: "Your changes has been saved" });
+        } else {
+          toaster.error({
+            title: response.data.msg ?? "Unable to update the challan",
+          });
+        }
+      })
+      .catch((e) =>
+        toaster.error({
+          title: e.response?.data?.msg ?? "Unable to update the challan",
+        }),
       );
-
-      if (response.status == 402) return new Error(response.data.msg);
-      toaster.info({
-        title: "Your changes has been saved",
-      });
-    } catch (e: any) {
-      toaster.error({
-        title: e.response?.data?.msg ?? e,
-      });
-    }
   }
+
   async function deleteReciept() {
     setIsDeleting(true);
-    try {
-      const formData = new FormData();
-      formData.append("challan_id", challan_id!);
-      formData.append("college", user?.college!);
+    const formData = new FormData();
+    formData.append("challan_id", challan_id!);
+    formData.append("college", user?.college!);
 
-      const response = await axios.post(
+    await axios
+      .post(
         process.env.NEXT_PUBLIC_ADMIN_URL + `feedeletechallan.php`,
         formData,
-      );
-
-      if (response.status == 402) return new Error(response.data.msg);
-      toaster.info({ title: "Challan Deleted Successfully" });
-      router.back();
-    } catch (e: any) {
-      toaster.error({
-        title: e.response?.data?.msg ?? e,
-      });
-    }
-    setIsDeleting(false);
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          toaster.info({ title: "Challan Deleted Successfully" });
+          router.back();
+        }
+      })
+      .catch((e: any) =>
+        toaster.error({
+          title: e.response?.data?.msg ?? "Unable to delete the challan",
+        }),
+      )
+      .finally(() => setIsDeleting(false));
   }
 
   return (

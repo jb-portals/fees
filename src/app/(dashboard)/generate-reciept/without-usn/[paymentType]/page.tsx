@@ -1159,7 +1159,7 @@ export default function WithoutUSNDynamicPage() {
   }
 
   async function updateReciept(state: typeof initialValues) {
-    try {
+    blk: {
       const formData = new FormData();
       formData.append("challan_no", challan_id!);
       formData.append("college", user?.college!);
@@ -1173,15 +1173,13 @@ export default function WithoutUSNDynamicPage() {
       formData.append("type", paymentType as string);
       formData.append("trans_id", state.chequeNo);
       formData.append("trans_date", state.date);
-      formData.append("tuition", state.tuitionFee.toString());
-      formData.append("vtu", state.vtuFee.toString());
-      formData.append("college_fee", state.collegeFee.toString());
-      formData.append("tuition", state.tuitionFee.toString());
-      formData.append("lab", state.labFee.toString());
+      formData.append("vtu", String(state.vtuFee));
+      formData.append("college_fee", String(state.collegeFee));
+      formData.append("lab", String(state.labFee));
       formData.append("bus", state.busFee.toString());
-      formData.append("excess", state.excessFee.toString());
+      formData.append("excess", String(state.excessFee));
       formData.append("security_deposit", state.securityDeposit.toString());
-      formData.append("hostel", state.hostelFee.toString());
+      formData.append("hostel", String(state.hostelFee));
       if (user?.college === "KSDC") {
         formData.append("reg_fee", state.reg_fee.toString());
         formData.append("admission_fee", state.admission_fee.toString());
@@ -1195,43 +1193,51 @@ export default function WithoutUSNDynamicPage() {
       formData.append("acad_year", state.chaAcadYear);
       formData.append("linked", data[0].linked);
 
-      const response = await axios.post(
-        process.env.NEXT_PUBLIC_ADMIN_URL + `feechallanupdate.php`,
-        formData,
-      );
-
-      if (response.status == 402) return new Error(response.data.msg);
-      toaster.info({
-        title: "Your changes has been saved",
-      });
-    } catch (e: any) {
-      toaster.error({
-        title: e.response?.data?.msg ?? e,
-      });
+      await axios
+        .post(
+          process.env.NEXT_PUBLIC_ADMIN_URL + `feechallanupdate.php`,
+          formData,
+        )
+        .then((response) => {
+          if (response.status == 200) {
+            toaster.info({ title: "Your changes has been saved" });
+          } else {
+            toaster.error({
+              title: response.data.msg ?? "Unable to update the challan",
+            });
+          }
+        })
+        .catch((e) =>
+          toaster.error({
+            title: e.response?.data?.msg ?? "Unable to update the challan",
+          }),
+        );
     }
   }
 
   async function deleteReciept() {
     setIsDeleting(true);
-    try {
-      const formData = new FormData();
-      formData.append("challan_id", challan_id!);
-      formData.append("college", user?.college!);
+    const formData = new FormData();
+    formData.append("challan_id", challan_id!);
+    formData.append("college", user?.college!);
 
-      const response = await axios.post(
+    await axios
+      .post(
         process.env.NEXT_PUBLIC_ADMIN_URL + `feedeletechallan.php`,
         formData,
-      );
-
-      if (response.status == 402) return new Error(response.data.msg);
-      toaster.info({ title: "Challan Deleted Successfully" });
-      router.back();
-    } catch (e: any) {
-      toaster.error({
-        title: e.response?.data?.msg ?? e,
-      });
-    }
-    setIsDeleting(false);
+      )
+      .then((response) => {
+        if (response.status === 200) {
+          toaster.info({ title: "Challan Deleted Successfully" });
+          router.back();
+        }
+      })
+      .catch((e: any) =>
+        toaster.error({
+          title: e.response?.data?.msg ?? "Unable to delete the challan",
+        }),
+      )
+      .finally(() => setIsDeleting(false));
   }
 
   return (
