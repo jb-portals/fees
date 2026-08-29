@@ -6,7 +6,10 @@ import { SessionData, sessionOptions } from "./session";
 import { cookies } from "next/headers";
 
 export async function auth() {
-  const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
 
   if (!session.id) return { isLoggedIn: false, user: null };
   const user = await api.getUser(session.id ?? "");

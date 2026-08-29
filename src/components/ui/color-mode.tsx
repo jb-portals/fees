@@ -11,7 +11,12 @@ export interface ColorModeProviderProps extends ThemeProviderProps {}
 
 export function ColorModeProvider(props: ColorModeProviderProps) {
   return (
-    <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
+    <ThemeProvider
+      scriptProps={{ suppressHydrationWarning: true }}
+      attribute="class"
+      disableTransitionOnChange
+      {...props}
+    />
   );
 }
 
@@ -83,12 +88,11 @@ export const LightMode = React.forwardRef<HTMLSpanElement, SpanProps>(
         display="contents"
         className="chakra-theme light"
         colorPalette="gray"
-        colorPalette="light"
         ref={ref}
         {...props}
       />
     );
-  }
+  },
 );
 
 export const DarkMode = React.forwardRef<HTMLSpanElement, SpanProps>(
@@ -99,10 +103,9 @@ export const DarkMode = React.forwardRef<HTMLSpanElement, SpanProps>(
         display="contents"
         className="chakra-theme dark"
         colorPalette="gray"
-        colorPalette="dark"
         ref={ref}
         {...props}
       />
     );
-  }
+  },
 );

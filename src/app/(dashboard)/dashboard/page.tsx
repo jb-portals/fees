@@ -37,24 +37,24 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
 );
 
 export default function Home() {
   const overallFeeDetails = useAppSelector(
-    (state) => state.fees.overall_fee.data
+    (state) => state.fees.overall_fee.data,
   ) as OverallFee[];
   const branchFeeDetails = useAppSelector(
-    (state) => state.fees.branch_fee.data
+    (state) => state.fees.branch_fee.data,
   ) as BranchFee[];
   const isBranchFeePending = useAppSelector(
-    (state) => state.fees.branch_fee.pending
+    (state) => state.fees.branch_fee.pending,
   );
   const isYearsFeePending = useAppSelector(
-    (state) => state.fees.fee_retrieve_years.pending
+    (state) => state.fees.fee_retrieve_years.pending,
   );
   const feeYearsDetails = useAppSelector(
-    (state) => state.fees.fee_retrieve_years.data
+    (state) => state.fees.fee_retrieve_years.data,
   ) as any[];
   const user = useUser();
 
@@ -118,10 +118,10 @@ export default function Home() {
                   columns={2}
                   justifyContent={"center"}
                 >
-                  {branchFeeDetails.map((branchFee) => {
+                  {branchFeeDetails.map((branchFee, i) => {
                     return (
                       <Card.Root
-                        key={branchFee.branch}
+                        key={branchFee.branch + i}
                         w={"full"}
                         px={"10"}
                         py={"5"}
@@ -248,10 +248,10 @@ export default function Home() {
                   columns={2}
                   justifyContent={"center"}
                 >
-                  {feeYearsDetails.map((yearFee) => {
+                  {feeYearsDetails.map((yearFee, i) => {
                     return (
                       <Card.Root
-                        key={yearFee.branch}
+                        key={`${i}`}
                         w={"full"}
                         px={"10"}
                         py={"5"}

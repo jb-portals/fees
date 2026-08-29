@@ -28,6 +28,10 @@ import {
   LuWorkflow,
 } from "react-icons/lu";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const ourSolutions = [
   { title: "Automatic Workflows", icon: LuWorkflow },
   { title: "Centralizes Data", icon: LuDatabase },
