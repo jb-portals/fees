@@ -1,4 +1,5 @@
 "use client";
+
 import {
 	AbsoluteCenter,
 	Box,
@@ -8,14 +9,9 @@ import {
 	VStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
-
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { AiOutlineCheck } from "react-icons/ai";
-
-interface GenerateRecieptLayoutProps {
-	children: React.ReactNode;
-}
 
 const items = [
 	{
@@ -55,9 +51,7 @@ const items = [
 	},
 ];
 
-export default function WithoutUSNLayout({
-	children,
-}: GenerateRecieptLayoutProps) {
+export function WithoutUSNPaymentTabs() {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const isInEditMode = searchParams.get("challan_id");
@@ -114,7 +108,6 @@ export default function WithoutUSNLayout({
 					)}
 				</Box>
 			</VStack>
-			<Tabs.ContentGroup py={"4"}>{children}</Tabs.ContentGroup>
 		</Tabs.Root>
 	);
 }

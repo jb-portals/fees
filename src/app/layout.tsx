@@ -1,6 +1,5 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Providers } from "./providers";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -21,9 +20,7 @@ export default function RootLayout({
 	return (
 		<html suppressHydrationWarning>
 			<body className={`${inter.className} overflow-hidden h-screen w-[100vw]`}>
-				<NuqsAdapter>
-					<Providers>{children}</Providers>
-				</NuqsAdapter>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);

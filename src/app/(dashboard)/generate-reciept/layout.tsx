@@ -1,23 +1,11 @@
-"use client";
-
-import { useCallback, useEffect } from "react";
 import GenerateRecieptLayout from "@/components/layouts/GenerateRecieptLayout";
-import { fetchBranchList } from "@/store/fees.slice";
-import { useUser } from "@/utils/auth";
-import { store } from "../../../store/";
+import { BranchListFetcher } from "./layout.client";
 
-export default function GenerateRecieptRootLayout(props: {
-	children: React.ReactNode;
-}) {
-	const user = useUser();
-
-	const fetchBranchListCb = useCallback(() => {
-		store.dispatch(fetchBranchList({ college: user?.college! }));
-	}, [user?.college]);
-
-	useEffect(() => {
-		fetchBranchListCb();
-	}, [fetchBranchListCb]);
-
-	return <GenerateRecieptLayout>{props?.children}</GenerateRecieptLayout>;
+export default function Layout({ children }: { children: React.ReactNode }) {
+	return (
+		<>
+			<BranchListFetcher />
+			<GenerateRecieptLayout>{children}</GenerateRecieptLayout>
+		</>
+	);
 }

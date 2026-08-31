@@ -1,11 +1,29 @@
-import WithoutUSNLayout from "@/components/layouts/WithoutUSNLayout";
+import { Box } from "@chakra-ui/react";
+import { Suspense } from "react";
+import { WithoutUSNPaymentTabs } from "@/components/layouts/WithoutUSNLayout";
+import Loading from "./loading";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
+export function generateStaticParams() {
+	return [
+		{ paymentType: "FEE" },
+		{ paymentType: "OTHERS" },
+		{ paymentType: "MISCELLANEOUS" },
+		{ paymentType: "SECURITY_DEPOSIT" },
+		{ paymentType: "BUS_FEE" },
+		{ paymentType: "HOSTEL_FEE" },
+		{ paymentType: "REGISTRATION_FEE" },
+	];
+}
 
-export default async function GenerateRecieptRootLayout(props: {
+export default function GenerateRecieptRootLayout(props: {
 	children: React.ReactNode;
 }) {
-	return <WithoutUSNLayout>{props?.children}</WithoutUSNLayout>;
+	return (
+		<>
+			<Suspense fallback={<Loading />}>
+				<WithoutUSNPaymentTabs />
+			</Suspense>
+			<Box py={"4"}>{props?.children}</Box>
+		</>
+	);
 }

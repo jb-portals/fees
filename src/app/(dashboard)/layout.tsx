@@ -1,5 +1,6 @@
 import { Box, HStack, VStack } from "@chakra-ui/react";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { auth } from "@/utils/auth-server";
@@ -29,7 +30,9 @@ export default async function DashboardRootLayout(props: {
 				gap={"0"}
 				id="main-content-area"
 			>
-				<Sidebar />
+				<Suspense fallback={<Box w="3xs" flexShrink="0" />}>
+					<Sidebar />
+				</Suspense>
 				<Box
 					w={"full"}
 					flex={"1"}
@@ -42,7 +45,9 @@ export default async function DashboardRootLayout(props: {
 					<main>{props?.children}</main>
 				</Box>
 
-				<SearchRightBar />
+				<Suspense fallback={null}>
+					<SearchRightBar />
+				</Suspense>
 			</HStack>
 		</VStack>
 	);

@@ -15,7 +15,6 @@ import {
 	VStack,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import Link from "next/link";
 import {
 	LuArmchair,
 	LuDatabase,
@@ -27,10 +26,7 @@ import {
 	LuUserCog,
 	LuWorkflow,
 } from "react-icons/lu";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
+import { HeroButton } from "./hero-button";
 
 const ourSolutions = [
 	{ title: "Automatic Workflows", icon: LuWorkflow },
@@ -121,9 +117,7 @@ export default function Home() {
 						streamlined and centralized.
 					</Text>
 					<HStack gap={"3"}>
-						<Button size={"lg"} variant={"surface"} asChild>
-							<Link href={"/signin"}>Signin to Dashboard</Link>
-						</Button>
+						<HeroButton />
 					</HStack>
 				</VStack>
 			</Center>
@@ -166,6 +160,7 @@ export default function Home() {
 				<SimpleGrid columns={{ base: 1, md: 2 }}>
 					{ourSolutions.map((item, _index) => (
 						<VStack
+							key={_index.toString()}
 							py={"5"}
 							px={"5"}
 							borderWidth={"thin"}
@@ -201,8 +196,13 @@ export default function Home() {
 
 			<VStack py={16} gap={"10"} px={"52"}>
 				<SimpleGrid columns={{ base: 1, md: 2 }}>
-					{keyFeatures.map((item) => (
-						<Box p={6} borderWidth={"thin"} borderColor={"border"}>
+					{keyFeatures.map((item, i) => (
+						<Box
+							p={6}
+							borderWidth={"thin"}
+							borderColor={"border"}
+							key={i.toString()}
+						>
 							<VStack align="start" gap={4}>
 								<Icon fontSize={"4xl"} color={"fg.muted"}>
 									<item.icon strokeWidth={1.2} />
@@ -212,7 +212,7 @@ export default function Home() {
 								{Array.isArray(item.description) ? (
 									<List.Root pl={4} color="fg.muted" fontSize={"sm"}>
 										{item.description.map((item, idx) => (
-											<List.Item key={idx}>{item}</List.Item>
+											<List.Item key={idx.toString()}>{item}</List.Item>
 										))}
 									</List.Root>
 								) : (
