@@ -1,10 +1,10 @@
-import {NextConfig} from "next"
+import type { NextConfig } from "next";
 export default {
-  experimental: {
-    optimizePackageImports: ["@chakra-ui/react"],
-  },
-  typescript:{
-    ignoreBuildErrors:true
-  },
-  cacheComponents: true,
+	experimental: {
+		optimizePackageImports: ["@chakra-ui/react"],
+	},
+	typescript: {
+		ignoreBuildErrors: true,
+	},
+	cacheComponents: true,
 } satisfies NextConfig;

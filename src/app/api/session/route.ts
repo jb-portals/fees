@@ -1,46 +1,45 @@
-import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
-import { NextRequest, NextResponse } from "next/server";
-import { sessionOptions, SessionData } from "@/utils/session";
+import { type NextRequest, NextResponse } from "next/server";
+import { type SessionData, sessionOptions } from "@/utils/session";
 
 export async function GET(request: Request) {
-  const response = new Response();
-  const session = await getIronSession<SessionData>(
-    request,
-    response,
-    sessionOptions
-  );
-  
-  if (!session.id) {
-    return NextResponse.json({ isLoggedIn: false }, { status: 401 });
-  }
+	const response = new Response();
+	const session = await getIronSession<SessionData>(
+		request,
+		response,
+		sessionOptions,
+	);
 
-  return NextResponse.json(session);
+	if (!session.id) {
+		return NextResponse.json({ isLoggedIn: false }, { status: 401 });
+	}
+
+	return NextResponse.json(session);
 }
 
 export async function POST(request: NextRequest) {
-  const response = new Response();
-  const session = await getIronSession<SessionData>(
-    request,
-    response,
-    sessionOptions
-  );
-  const input = await request.json();
+	const response = new Response();
+	const session = await getIronSession<SessionData>(
+		request,
+		response,
+		sessionOptions,
+	);
+	const input = await request.json();
 
-  session.id = input.id;
+	session.id = input.id;
 
-  await session.save();
+	await session.save();
 
-  return response;
+	return response;
 }
 
 export async function DELETE(request: Request) {
-  const response = new Response();
-  const session = await getIronSession<SessionData>(
-    request,
-    response,
-    sessionOptions
-  );
-  session.destroy();
-  return response;
+	const response = new Response();
+	const session = await getIronSession<SessionData>(
+		request,
+		response,
+		sessionOptions,
+	);
+	session.destroy();
+	return response;
 }

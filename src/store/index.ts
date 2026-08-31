@@ -1,14 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { TypedUseSelectorHook, useSelector } from "react-redux";
+import { type TypedUseSelectorHook, useSelector } from "react-redux";
 import { FeesSlice } from "./fees.slice";
 
 export const store = configureStore({
-  reducer: {
-    [FeesSlice.name]: FeesSlice.reducer,
-  },
-  devTools: {
-    name: "My Fee Store",
-  },
+	reducer: {
+		[FeesSlice.name]: FeesSlice.reducer,
+	},
+	devTools: {
+		name: "My Fee Store",
+	},
 });
 
 export type RootState = ReturnType<typeof store.getState>;

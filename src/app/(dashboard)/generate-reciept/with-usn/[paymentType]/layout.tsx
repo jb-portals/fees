@@ -5,7 +5,7 @@ import WithUSNLayout from "@/components/layouts/WithUSNLayout copy";
 export const instant = false;
 
 export default async function GenerateRecieptRootLayout(props: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return <WithUSNLayout>{props?.children}</WithUSNLayout>;
+	return <WithUSNLayout>{props?.children}</WithUSNLayout>;
 }

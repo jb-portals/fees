@@ -5,7 +5,7 @@ import WithoutUSNLayout from "@/components/layouts/WithoutUSNLayout";
 export const instant = false;
 
 export default async function GenerateRecieptRootLayout(props: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return <WithoutUSNLayout>{props?.children}</WithoutUSNLayout>;
+	return <WithoutUSNLayout>{props?.children}</WithoutUSNLayout>;
 }

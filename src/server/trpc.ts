@@ -1,5 +1,4 @@
 import { initTRPC } from "@trpc/server";
-import { appRouter } from "./routers";
 
 // Avoid exporting the entire t-object
 // since it's not very descriptive.

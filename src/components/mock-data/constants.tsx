@@ -1,352 +1,352 @@
 export const BANKS = (college: string | undefined) => {
-  if (college == "KSPU")
-    return [
-      {
-        option: "ICICI",
-        value: "ICICI",
-      },
-      {
-        option: "UNION",
-        value: "UNION",
-      },
-    ];
-  else if (college == "KSPT")
-    return [
-      {
-        option: "UNION",
-        value: "UNION",
-      },
-      {
-        option: "AXIS",
-        value: "AXIS",
-      },
-      {
-        option: "OFFICE",
-        value: "OFFICE",
-      },
-    ];
-  else if (college == "KSSA")
-    return [
-      {
-        option: "AXIS",
-        value: "AXIS",
-      },
-    ];
-  else if (college == "KSSEM")
-    return [
-      {
-        option: "AXIS",
-        value: "AXIS",
-      },
-    ];
-  else if (college == "KSIT" || college == "KSSEM" || college == "KSSA")
-    return [
-      {
-        option: "AXIS",
-        value: "AXIS",
-      },
-      {
-        option: "UNION",
-        value: "UNION",
-      },
-    ];
-  else
-    return [
-      {
-        option: "UNION",
-        value: "UNION",
-      },
-      {
-        option: "AXIS",
-        value: "AXIS",
-      },
-      {
-        option: "ICICI",
-        value: "ICICI",
-      },
-      {
-        option: "OFFICE",
-        value: "OFFICE",
-      },
-    ];
+	if (college === "KSPU")
+		return [
+			{
+				option: "ICICI",
+				value: "ICICI",
+			},
+			{
+				option: "UNION",
+				value: "UNION",
+			},
+		];
+	else if (college === "KSPT")
+		return [
+			{
+				option: "UNION",
+				value: "UNION",
+			},
+			{
+				option: "AXIS",
+				value: "AXIS",
+			},
+			{
+				option: "OFFICE",
+				value: "OFFICE",
+			},
+		];
+	else if (college === "KSSA")
+		return [
+			{
+				option: "AXIS",
+				value: "AXIS",
+			},
+		];
+	else if (college === "KSSEM")
+		return [
+			{
+				option: "AXIS",
+				value: "AXIS",
+			},
+		];
+	else if (college === "KSIT" || college === "KSSEM" || college === "KSSA")
+		return [
+			{
+				option: "AXIS",
+				value: "AXIS",
+			},
+			{
+				option: "UNION",
+				value: "UNION",
+			},
+		];
+	else
+		return [
+			{
+				option: "UNION",
+				value: "UNION",
+			},
+			{
+				option: "AXIS",
+				value: "AXIS",
+			},
+			{
+				option: "ICICI",
+				value: "ICICI",
+			},
+			{
+				option: "OFFICE",
+				value: "OFFICE",
+			},
+		];
 };
 
 export const CATS = (college: string | undefined) => {
-  if (college == "KSSA")
-    return [
-      {
-        value: "1G",
-        option: "1G",
-      },
-      {
-        value: "2G",
-        option: "2G",
-      },
-      {
-        value: "2AG",
-        option: "2AG",
-      },
-      {
-        value: "2BG",
-        option: "2BG",
-      },
-      {
-        value: "3AG",
-        option: "3AG",
-      },
-      {
-        value: "3AGR",
-        option: "3AGR",
-      },
-      {
-        value: "SCG",
-        option: "SCG",
-      },
-      {
-        value: "SCGR",
-        option: "SCGR",
-      },
-      {
-        value: "GMH",
-        option: "GMH",
-      },
-      {
-        value: "CET",
-        option: "CET",
-      },
-      {
-        value: "SNQ",
-        option: "SNQ",
-      },
-      {
-        value: "MANAGEMENT",
-        option: "MANAGEMENT",
-      },
-      {
-        value: "COMEDK",
-        option: "COMEDK",
-      },
-      {
-        value: "GM",
-        option: "GM",
-      },
-      {
-        value: "SC",
-        option: "SC",
-      },
-      {
-        value: "ST",
-        option: "ST",
-      },
-      {
-        value: "CAT-I",
-        option: "CAT-I",
-      },
-      {
-        value: "DIP-LE",
-        option: "DIP-LE",
-      },
-      {
-        value: "DCET",
-        option: "DCET",
-      },
-      {
-        value: "OTHERS",
-        option: "OTHERS",
-      },
-    ];
-  else
-    return [
-      {
-        value: "CET",
-        option: "CET",
-      },
-      {
-        value: "SNQ",
-        option: "SNQ",
-      },
-      {
-        value: "MANAGEMENT",
-        option: "MANAGEMENT",
-      },
-      {
-        value: "COMEDK",
-        option: "COMEDK",
-      },
-      {
-        value: "GM",
-        option: "GM",
-      },
-      {
-        value: "SC",
-        option: "SC",
-      },
-      {
-        value: "ST",
-        option: "ST",
-      },
-      {
-        value: "CAT-I",
-        option: "CAT-I",
-      },
-      {
-        value: "DIP-LE",
-        option: "DIP-LE",
-      },
-      {
-        value: "DCET",
-        option: "DCET",
-      },
-      {
-        value: "OTHERS",
-        option: "OTHERS",
-      },
-    ];
+	if (college === "KSSA")
+		return [
+			{
+				value: "1G",
+				option: "1G",
+			},
+			{
+				value: "2G",
+				option: "2G",
+			},
+			{
+				value: "2AG",
+				option: "2AG",
+			},
+			{
+				value: "2BG",
+				option: "2BG",
+			},
+			{
+				value: "3AG",
+				option: "3AG",
+			},
+			{
+				value: "3AGR",
+				option: "3AGR",
+			},
+			{
+				value: "SCG",
+				option: "SCG",
+			},
+			{
+				value: "SCGR",
+				option: "SCGR",
+			},
+			{
+				value: "GMH",
+				option: "GMH",
+			},
+			{
+				value: "CET",
+				option: "CET",
+			},
+			{
+				value: "SNQ",
+				option: "SNQ",
+			},
+			{
+				value: "MANAGEMENT",
+				option: "MANAGEMENT",
+			},
+			{
+				value: "COMEDK",
+				option: "COMEDK",
+			},
+			{
+				value: "GM",
+				option: "GM",
+			},
+			{
+				value: "SC",
+				option: "SC",
+			},
+			{
+				value: "ST",
+				option: "ST",
+			},
+			{
+				value: "CAT-I",
+				option: "CAT-I",
+			},
+			{
+				value: "DIP-LE",
+				option: "DIP-LE",
+			},
+			{
+				value: "DCET",
+				option: "DCET",
+			},
+			{
+				value: "OTHERS",
+				option: "OTHERS",
+			},
+		];
+	else
+		return [
+			{
+				value: "CET",
+				option: "CET",
+			},
+			{
+				value: "SNQ",
+				option: "SNQ",
+			},
+			{
+				value: "MANAGEMENT",
+				option: "MANAGEMENT",
+			},
+			{
+				value: "COMEDK",
+				option: "COMEDK",
+			},
+			{
+				value: "GM",
+				option: "GM",
+			},
+			{
+				value: "SC",
+				option: "SC",
+			},
+			{
+				value: "ST",
+				option: "ST",
+			},
+			{
+				value: "CAT-I",
+				option: "CAT-I",
+			},
+			{
+				value: "DIP-LE",
+				option: "DIP-LE",
+			},
+			{
+				value: "DCET",
+				option: "DCET",
+			},
+			{
+				value: "OTHERS",
+				option: "OTHERS",
+			},
+		];
 };
 
 export const STATE_CATS = () => {
-  return [
-    {
-      value: "KARNATAKA",
-      option: "KARNATAKA",
-    },
-    {
-      value: "NON-KARNATAKA/CBSE/ICSE",
-      option: "NON-KARNATAKA/CBSE/ICSE",
-    },
-    {
-      value: "INDIAN",
-      option: "INDIAN",
-    },
-    {
-      value: "FORIEGN",
-      option: "FORIEGN",
-    },
-  ];
+	return [
+		{
+			value: "KARNATAKA",
+			option: "KARNATAKA",
+		},
+		{
+			value: "NON-KARNATAKA/CBSE/ICSE",
+			option: "NON-KARNATAKA/CBSE/ICSE",
+		},
+		{
+			value: "INDIAN",
+			option: "INDIAN",
+		},
+		{
+			value: "FORIEGN",
+			option: "FORIEGN",
+		},
+	];
 };
 
 export const PAYMENTMODES = (college: string | undefined) => {
-  if (college == "KSSEM")
-    return [
-      {
-        option: "Online",
-        value: "ONLINE",
-      },
-      {
-        option: "Cash",
-        value: "CASH",
-      },
-      {
-        option: "Cheque",
-        value: "CHEQUE",
-      },
-      {
-        option: "DD",
-        value: "DD",
-      },
-      {
-        option: "UPI SCAN",
-        value: "UPI SCAN",
-      },
-    ];
-  else
-    return [
-      {
-        option: "Online",
-        value: "ONLINE",
-      },
-      {
-        option: "Cash",
-        value: "CASH",
-      },
-      {
-        option: "Cheque",
-        value: "CHEQUE",
-      },
-      {
-        option: "DD",
-        value: "DD",
-      },
-    ];
+	if (college === "KSSEM")
+		return [
+			{
+				option: "Online",
+				value: "ONLINE",
+			},
+			{
+				option: "Cash",
+				value: "CASH",
+			},
+			{
+				option: "Cheque",
+				value: "CHEQUE",
+			},
+			{
+				option: "DD",
+				value: "DD",
+			},
+			{
+				option: "UPI SCAN",
+				value: "UPI SCAN",
+			},
+		];
+	else
+		return [
+			{
+				option: "Online",
+				value: "ONLINE",
+			},
+			{
+				option: "Cash",
+				value: "CASH",
+			},
+			{
+				option: "Cheque",
+				value: "CHEQUE",
+			},
+			{
+				option: "DD",
+				value: "DD",
+			},
+		];
 };
 
 export const SEMS = (college: string | undefined) => {
-  if (college == "KSPU")
-    return [
-      ...new Array(2).fill(0).map((_value, index) => ({
-        value: (index + 1).toString(),
-        option: (index + 1).toString(),
-      })),
-    ];
-  else if (college == "KSSA")
-    return [
-      ...new Array(10).fill(0).map((_value, index) => ({
-        value: (index + 1).toString(),
-        option: (index + 1).toString(),
-      })),
-    ];
-  else
-    return [
-      ...new Array(8).fill(0).map((_value, index) => ({
-        value: (index + 1).toString(),
-        option: (index + 1).toString(),
-      })),
-    ];
+	if (college === "KSPU")
+		return [
+			...new Array(2).fill(0).map((_value, index) => ({
+				value: (index + 1).toString(),
+				option: (index + 1).toString(),
+			})),
+		];
+	else if (college === "KSSA")
+		return [
+			...new Array(10).fill(0).map((_value, index) => ({
+				value: (index + 1).toString(),
+				option: (index + 1).toString(),
+			})),
+		];
+	else
+		return [
+			...new Array(8).fill(0).map((_value, index) => ({
+				value: (index + 1).toString(),
+				option: (index + 1).toString(),
+			})),
+		];
 };
 
 export const ACADYEARS = () => {
-  return [
-    {
-      value: "2026",
-      option: "2026-27",
-    },
-    {
-      value: "2025",
-      option: "2025-26",
-    },
-    {
-      value: "2024",
-      option: "2024-25",
-    },
-    {
-      value: "2023",
-      option: "2023-24",
-    },
-    {
-      value: "2022",
-      option: "2022-23",
-    },
-  ];
+	return [
+		{
+			value: "2026",
+			option: "2026-27",
+		},
+		{
+			value: "2025",
+			option: "2025-26",
+		},
+		{
+			value: "2024",
+			option: "2024-25",
+		},
+		{
+			value: "2023",
+			option: "2023-24",
+		},
+		{
+			value: "2022",
+			option: "2022-23",
+		},
+	];
 };
 
 /** KSDC-only fee breakdown for challan generation */
 export const KSDC_FEE_FIELDS = [
-  { name: "reg_fee", label: "Registration Fee" },
-  { name: "admission_fee", label: "Admission Fee" },
-  { name: "sports_fee", label: "Sports Fee" },
-  { name: "processing_fee", label: "Processing Fee" },
-  { name: "cultural_fee", label: "Cultural Activity Fee" },
-  { name: "eligibility_fee", label: "Eligibility Fee" },
-  { name: "tuition_fee", label: "Tuition Fee" },
+	{ name: "reg_fee", label: "Registration Fee" },
+	{ name: "admission_fee", label: "Admission Fee" },
+	{ name: "sports_fee", label: "Sports Fee" },
+	{ name: "processing_fee", label: "Processing Fee" },
+	{ name: "cultural_fee", label: "Cultural Activity Fee" },
+	{ name: "eligibility_fee", label: "Eligibility Fee" },
+	{ name: "tuition_fee", label: "Tuition Fee" },
 ] as const;
 
 export const KSDC_FEE_INITIAL = {
-  reg_fee: 0,
-  admission_fee: 0,
-  sports_fee: 0,
-  processing_fee: 0,
-  cultural_fee: 0,
-  eligibility_fee: 0,
-  tuition_fee: 0,
+	reg_fee: 0,
+	admission_fee: 0,
+	sports_fee: 0,
+	processing_fee: 0,
+	cultural_fee: 0,
+	eligibility_fee: 0,
+	tuition_fee: 0,
 };
 
 export const sumKsdcFees = (values: typeof KSDC_FEE_INITIAL) =>
-  +(
-    +values.reg_fee +
-    +values.admission_fee +
-    +values.sports_fee +
-    +values.processing_fee +
-    +values.cultural_fee +
-    +values.eligibility_fee +
-    +values.tuition_fee
-  );
+	+(
+		+values.reg_fee +
+		+values.admission_fee +
+		+values.sports_fee +
+		+values.processing_fee +
+		+values.cultural_fee +
+		+values.eligibility_fee +
+		+values.tuition_fee
+	);
