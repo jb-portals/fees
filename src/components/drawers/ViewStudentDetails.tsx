@@ -166,22 +166,33 @@ export default function ViewStudentsDetails({
 			});
 	}, [pending, open, id, data, setFormikState]);
 
-	function changeStateValue() {
-		setFieldValue(
-			"remaining",
-			parseInt(values.total.toString(), 10) -
-				parseInt(values.paid.toString(), 10),
-		);
-		if (values.total === values.paid) setFieldValue("status", "FULLY PAID");
-		else if (values.paid < values.total && values.paid > 0)
-			setFieldValue("status", "PARTIALLY PAID");
-		else if (values.remaining === values.total)
-			setFieldValue("status", "NOT PAID");
-	}
-
 	useEffect(() => {
-		changeStateValue();
-	}, [changeStateValue]);
+		if (!open) return;
+
+		const total = Number(values.total) || 0;
+		const paid = Number(values.paid) || 0;
+		const remaining = total - paid;
+		const status: FormikState["status"] =
+			total === paid
+				? "FULLY PAID"
+				: paid > 0 && paid < total
+					? "PARTIALLY PAID"
+					: "NOT PAID";
+
+		if (values.remaining !== remaining) {
+			setFieldValue("remaining", remaining, false);
+		}
+		if (values.status !== status) {
+			setFieldValue("status", status, false);
+		}
+	}, [
+		open,
+		values.total,
+		values.paid,
+		values.remaining,
+		values.status,
+		setFieldValue,
+	]);
 
 	const updateStudent = async () => {
 		try {

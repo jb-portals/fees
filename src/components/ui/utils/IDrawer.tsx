@@ -32,7 +32,13 @@ export default function IDrawer({
 	size,
 }: IDrawerProps) {
 	return (
-		<DrawerRoot open={open} onOpenChange={onClose} size={size}>
+		<DrawerRoot
+			open={open}
+			onOpenChange={(details) => {
+				if (!details.open) onClose();
+			}}
+			size={size}
+		>
 			<DrawerContent>
 				<DrawerHeader
 					className="border-b bg-primary border-b-gray-300"
