@@ -40,10 +40,18 @@ const getSchema = (college?: string) =>
 	Yup.object().shape({
 		name: Yup.string().required().min(2),
 		phone: Yup.string()
-			.transform((value) => (value === "" ? undefined : value))
-			.optional()
-			.min(10, "Phone number should be 10 digits")
-			.max(10, "Phone number can't be exceed more than 10 digits"),
+			.nullable()
+			.transform((value) =>
+				value == null || String(value).trim() === ""
+					? undefined
+					: String(value).trim(),
+			)
+			.notRequired()
+			.test(
+				"phone-length",
+				"Phone number should be 10 digits",
+				(value) => !value || /^\d{10}$/.test(value),
+			),
 		sem: Yup.string().required("Sem is required"),
 		category: Yup.string().required("Year is required"),
 		...(college === "KSDC"
