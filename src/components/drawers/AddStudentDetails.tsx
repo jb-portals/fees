@@ -3,7 +3,6 @@ import {
 	Input,
 	InputGroup,
 	NativeSelect,
-	NumberInput,
 	Text,
 	useDisclosure,
 	VStack,
@@ -197,17 +196,18 @@ export default function AddStudentsDetails({ children }: props) {
 						px={"5"}
 					>
 						<Field.Label flex={1}>
-							<Text>Phone Number</Text>
+							<Text>Phone Number (optional)</Text>
 						</Field.Label>
 						<InputGroup startAddon={"+91"}>
-							<NumberInput.Root
+							<Input
 								name="phone"
-								w={"full"}
+								type="tel"
+								inputMode="numeric"
+								maxLength={10}
 								value={values.phone}
 								onChange={handleChange}
-							>
-								<NumberInput.Input onBlur={handleBlur} />
-							</NumberInput.Root>
+								onBlur={handleBlur}
+							/>
 						</InputGroup>
 						<Field.ErrorText>{errors.phone}</Field.ErrorText>
 					</Field.Root>

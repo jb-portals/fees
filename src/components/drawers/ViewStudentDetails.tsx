@@ -8,7 +8,6 @@ import {
 	Input,
 	InputGroup,
 	NativeSelect,
-	NumberInput,
 	SimpleGrid,
 	Spinner,
 	Tag,
@@ -516,17 +515,18 @@ export default function ViewStudentsDetails({
 							px={"5"}
 						>
 							<Field.Label flex={1}>
-								<Text>Phone Number</Text>
+								<Text>Phone Number (optional)</Text>
 							</Field.Label>
 							<InputGroup startAddon={"+91"}>
-								<NumberInput.Root
+								<Input
 									name="phone"
-									w={"full"}
+									type="tel"
+									inputMode="numeric"
+									maxLength={10}
 									value={values.phone}
 									onChange={handleChange}
-								>
-									<NumberInput.Input name="phone" onBlur={onFieldBlur} />
-								</NumberInput.Root>
+									onBlur={onFieldBlur}
+								/>
 							</InputGroup>
 							<Field.ErrorText>{errors.phone}</Field.ErrorText>
 						</Field.Root>
