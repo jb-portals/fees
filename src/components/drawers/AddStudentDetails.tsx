@@ -42,16 +42,19 @@ const getSchema = (college?: string) =>
 		usn: Yup.string().required(),
 		name: Yup.string().required().min(2),
 		phone: Yup.string()
-			.required()
+			.transform((value) => (value === "" ? undefined : value))
+			.optional()
 			.min(10, "Phone number should be 10 digits")
-			.max(10, "Phone number can't be exceed more than 10 digits")
-			.optional(),
+			.max(10, "Phone number can't be exceed more than 10 digits"),
 		sem: Yup.string().required("Sem is required"),
 		category: Yup.string().required("Category is required"),
-		state_category:
-			college === "KSDC"
-				? Yup.string().required("State category is required")
-				: Yup.string().optional(),
+		...(college === "KSDC"
+			? {
+					state_category: Yup.string()
+						.trim()
+						.required("State category is required"),
+				}
+			: {}),
 		college: Yup.string(),
 		student_college: Yup.string().when("college", ([college], sch) => {
 			return college === "HOSTEL"
