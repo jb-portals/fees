@@ -1,20 +1,20 @@
 import {
-  Alert,
-  Box,
-  Button,
-  Field,
-  Heading,
-  HStack,
-  Input,
-  InputGroup,
-  NativeSelect,
-  NumberInput,
-  SimpleGrid,
-  Spinner,
-  Tag,
-  Text,
-  useDisclosure,
-  VStack,
+	Alert,
+	Box,
+	Button,
+	Field,
+	Heading,
+	HStack,
+	Input,
+	InputGroup,
+	NativeSelect,
+	NumberInput,
+	SimpleGrid,
+	Spinner,
+	Tag,
+	Text,
+	useDisclosure,
+	VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -27,8 +27,8 @@ import * as Yup from "yup";
 import { useAppDispatch } from "@/hooks";
 import { useAppSelector } from "@/store";
 import {
-  fetchFeeDetails,
-  fetchSelectedFeeSearchDetails,
+	fetchFeeDetails,
+	fetchSelectedFeeSearchDetails,
 } from "@/store/fees.slice";
 import { useUser } from "@/utils/auth";
 import { CATS, SEMS, STATE_CATS } from "../mock-data/constants";
@@ -37,682 +37,705 @@ import IDrawer from "../ui/utils/IDrawer";
 import IModal from "../ui/utils/IModal";
 
 const getSchema = (college?: string) =>
-  Yup.object().shape({
-    name: Yup.string().required().min(2),
-    phone: Yup.string()
-      .transform((value) => (value === "" ? undefined : value))
-      .optional()
-      .min(10, "Phone number should be 10 digits")
-      .max(10, "Phone number can't be exceed more than 10 digits"),
-    sem: Yup.string().required("Sem is required"),
-    category: Yup.string().required("Year is required"),
-    ...(college === "KSDC"
-      ? {
-          state_category: Yup.string()
-            .trim()
-            .required("State category is required"),
-        }
-      : {}),
-    branch: Yup.string().required("Branch is required"),
-    total: Yup.number().required().min(0).typeError("invalid number"),
-    paid: Yup.number().required().min(0).typeError("invalid number"),
-  });
+	Yup.object().shape({
+		name: Yup.string().required().min(2),
+		phone: Yup.string()
+			.transform((value) => (value === "" ? undefined : value))
+			.optional()
+			.min(10, "Phone number should be 10 digits")
+			.max(10, "Phone number can't be exceed more than 10 digits"),
+		sem: Yup.string().required("Sem is required"),
+		category: Yup.string().required("Year is required"),
+		...(college === "KSDC"
+			? {
+					state_category: Yup.string()
+						.trim()
+						.required("State category is required"),
+				}
+			: {}),
+		branch: Yup.string().required("Branch is required"),
+		total: Yup.number().required().min(0).typeError("invalid number"),
+		paid: Yup.number().required().min(0).typeError("invalid number"),
+	});
 type FormikState = {
-  id: string;
-  name: string;
-  phone: string;
-  usn: string;
-  sem: string;
-  branch: string;
-  total: number;
-  status: "FULLY PAID" | "PARTIALLY PAID" | "NOT PAID";
-  paid: number;
-  remaining: number;
-  category: string;
-  state_category: string;
+	id: string;
+	name: string;
+	phone: string;
+	usn: string;
+	sem: string;
+	branch: string;
+	total: number;
+	status: "FULLY PAID" | "PARTIALLY PAID" | "NOT PAID";
+	paid: number;
+	remaining: number;
+	category: string;
+	state_category: string;
 };
 const initialState: FormikState = {
-  id: "",
-  usn: "",
-  name: "",
-  phone: "",
-  sem: "",
-  branch: "",
-  total: 0,
-  status: "NOT PAID",
-  paid: 0,
-  remaining: 0,
-  category: "",
-  state_category: "",
+	id: "",
+	usn: "",
+	name: "",
+	phone: "",
+	sem: "",
+	branch: "",
+	total: 0,
+	status: "NOT PAID",
+	paid: 0,
+	remaining: 0,
+	category: "",
+	state_category: "",
 };
 
 export default function ViewStudentsDetails({
-  id,
-  children,
-  regno,
+	id,
+	children,
+	regno,
 }: {
-  id: string;
-  regno: string;
-  children: ({ onOpen }: { onOpen: () => void }) => React.JSX.Element;
+	id: string;
+	regno: string;
+	children: ({ onOpen }: { onOpen: () => void }) => React.JSX.Element;
 }) {
-  const branch_list = useAppSelector(
-    (state) => state.fees.branch_list.data,
-  ) as [];
-  const [isDeleting, setIsDeleting] = useState(false);
+	const branch_list = useAppSelector(
+		(state) => state.fees.branch_list.data,
+	) as [];
+	const [isDeleting, setIsDeleting] = useState(false);
 
-  const data = useAppSelector((state) => state.fees.selected_fee.data);
-  const pending = useAppSelector((state) => state.fees.selected_fee.pending);
-  const router = useRouter();
-  const acadYear = useAppSelector((state) => state.fees.acadYear);
-  const user = useUser();
-  const {
-    errors,
-    touched,
-    setFieldValue,
-    values,
-    isSubmitting,
-    isValid,
-    handleBlur,
-    handleChange,
-    handleSubmit,
-    setFormikState,
-  } = useFormik<FormikState>({
-    initialValues: initialState,
-    onSubmit: async () => await updateStudent(),
-    validationSchema: getSchema(user?.college),
-    enableReinitialize: true,
-    initialStatus: "Loading",
-  });
+	const data = useAppSelector((state) => state.fees.selected_fee.data);
+	const pending = useAppSelector((state) => state.fees.selected_fee.pending);
+	const router = useRouter();
+	const acadYear = useAppSelector((state) => state.fees.acadYear);
+	const user = useUser();
+	const {
+		errors,
+		touched,
+		setFieldValue,
+		values,
+		isSubmitting,
+		isValid,
+		handleBlur,
+		handleChange,
+		handleSubmit,
+		setFormikState,
+		setTouched,
+		validateForm,
+	} = useFormik<FormikState>({
+		initialValues: initialState,
+		onSubmit: async () => await updateStudent(),
+		validationSchema: getSchema(user?.college),
+		enableReinitialize: true,
+		initialStatus: "Loading",
+	});
 
-  const dispatch = useAppDispatch();
-  const { onOpen, open, onClose } = useDisclosure();
-  const {
-    onOpen: onPaymentOpen,
-    open: isPaymentOpen,
-    onClose: onPaymentClose,
-  } = useDisclosure();
+	const onFieldBlur = async (
+		e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>,
+	) => {
+		handleBlur(e);
+		const formErrors = await validateForm();
+		const fieldsWithErrors = Object.fromEntries(
+			Object.keys(formErrors).map((key) => [key, true]),
+		);
+		await setTouched(
+			{
+				...touched,
+				[e.target.name]: true,
+				...fieldsWithErrors,
+			},
+			false,
+		);
+	};
 
-  const Categories = CATS(user?.college);
-  const stateCategories = STATE_CATS();
+	const dispatch = useAppDispatch();
+	const { onOpen, open, onClose } = useDisclosure();
+	const {
+		onOpen: onPaymentOpen,
+		open: isPaymentOpen,
+		onClose: onPaymentClose,
+	} = useDisclosure();
 
-  useEffect(() => {
-    if (id && open && user?.college) {
-      dispatch(
-        fetchSelectedFeeSearchDetails({ id, regno, college: user?.college! }),
-      );
-    }
-  }, [id, open, regno, dispatch, user?.college]);
+	const Categories = CATS(user?.college);
+	const stateCategories = STATE_CATS();
 
-  useEffect(() => {
-    if (open && id && !pending)
-      setFormikState({
-        isSubmitting: false,
-        values: {
-          id: data[0]?.id ?? "",
-          usn: data[0]?.regno ?? "",
-          phone: data[0]?.phone ?? "",
-          name: data[0]?.name ?? "",
-          sem: data[0]?.sem ?? "",
-          branch: data[0]?.branch ?? "",
-          total: data[0]?.total ?? "",
-          category: data[0]?.category ?? "",
-          state_category: data[0]?.state_category ?? "",
-          status: data[0]?.status ?? "",
-          paid: data[0]?.paid ?? "",
-          remaining: data[0]?.remaining ?? 0,
-        },
-        errors: {},
-        touched: {},
-        submitCount: 0,
-        status: "",
-        isValidating: true,
-      });
-  }, [pending, open, id, data, setFormikState]);
+	useEffect(() => {
+		if (id && open && user?.college) {
+			dispatch(
+				fetchSelectedFeeSearchDetails({ id, regno, college: user?.college! }),
+			);
+		}
+	}, [id, open, regno, dispatch, user?.college]);
 
-  useEffect(() => {
-    if (!open) return;
+	useEffect(() => {
+		if (open && id && !pending)
+			setFormikState({
+				isSubmitting: false,
+				values: {
+					id: data[0]?.id ?? "",
+					usn: data[0]?.regno ?? "",
+					phone: data[0]?.phone ?? "",
+					name: data[0]?.name ?? "",
+					sem: data[0]?.sem ?? "",
+					branch: data[0]?.branch ?? "",
+					total: data[0]?.total ?? "",
+					category: data[0]?.category ?? "",
+					state_category: data[0]?.state_category ?? "",
+					status: data[0]?.status ?? "",
+					paid: data[0]?.paid ?? "",
+					remaining: data[0]?.remaining ?? 0,
+				},
+				errors: {},
+				touched: {},
+				submitCount: 0,
+				status: "",
+				isValidating: true,
+			});
+	}, [pending, open, id, data, setFormikState]);
 
-    const total = Number(values.total) || 0;
-    const paid = Number(values.paid) || 0;
-    const remaining = total - paid;
-    const status: FormikState["status"] =
-      total === paid
-        ? "FULLY PAID"
-        : paid > 0 && paid < total
-          ? "PARTIALLY PAID"
-          : "NOT PAID";
+	useEffect(() => {
+		if (!open) return;
 
-    if (values.remaining !== remaining) {
-      setFieldValue("remaining", remaining, false);
-    }
-    if (values.status !== status) {
-      setFieldValue("status", status, false);
-    }
-  }, [
-    open,
-    values.total,
-    values.paid,
-    values.remaining,
-    values.status,
-    setFieldValue,
-  ]);
+		const total = Number(values.total) || 0;
+		const paid = Number(values.paid) || 0;
+		const remaining = total - paid;
+		const status: FormikState["status"] =
+			total === paid
+				? "FULLY PAID"
+				: paid > 0 && paid < total
+					? "PARTIALLY PAID"
+					: "NOT PAID";
 
-  const updateStudent = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("id", values.id);
-      formData.append("usn", values.usn);
-      formData.append("name", values.name);
-      formData.append("phone", values.phone);
-      formData.append("category", values.category);
-      formData.append("state_category", values.state_category);
-      formData.append("sem", values.sem);
-      formData.append("branch", values.branch);
-      formData.append("college", user?.college!);
-      formData.append("total_fee", values.total.toString());
-      formData.append("status", values.status);
-      formData.append("paid", values.paid.toString());
-      formData.append("remaining", values.remaining.toString());
-      formData.append("acadyear", acadYear);
-      const response = await axios(
-        `${process.env.NEXT_PUBLIC_ADMIN_URL}studentupdate.php`,
-        {
-          method: "POST",
-          data: formData,
-        },
-      );
-      if (response?.status !== 201) throw Error("Something went wrong !");
-      toaster.success({ title: "Updated successfully" });
-      dispatch(
-        fetchFeeDetails({
-          branch: values.branch,
-          year: data[0].year,
-          college: user?.college!,
-        }),
-      );
-      router.refresh();
-      onClose();
-    } catch (e: any) {
-      toaster.error({ title: e.response.data?.msg });
-    }
-  };
+		if (values.remaining !== remaining) {
+			setFieldValue("remaining", remaining, false);
+		}
+		if (values.status !== status) {
+			setFieldValue("status", status, false);
+		}
+	}, [
+		open,
+		values.total,
+		values.paid,
+		values.remaining,
+		values.status,
+		setFieldValue,
+	]);
 
-  const deleteStudent = useCallback(async () => {
-    setIsDeleting(true);
-    try {
-      const formData = new FormData();
-      formData.append("id", values.id);
-      formData.append("usn", values.usn);
-      formData.append("college", user?.college!);
-      formData.append("acadyear", acadYear);
-      const response = await axios(
-        `${process.env.NEXT_PUBLIC_ADMIN_URL}studentdelete.php`,
-        {
-          method: "POST",
-          data: formData,
-        },
-      );
-      if (response?.status !== 201) throw Error("Something went wrong !");
-      toaster.info({ title: "Deleted successfully" });
-      dispatch(
-        fetchFeeDetails({
-          branch: values.branch,
-          year: data[0].year,
-          college: user?.college!,
-        }),
-      );
-      router.refresh();
-      onClose();
-      onClose();
-    } catch (e: any) {
-      toaster.error({ title: e.response.data?.msg });
-    }
-    setIsDeleting(false);
-  }, [
-    values.id,
-    values.usn,
-    user?.college,
-    data,
-    dispatch,
-    router,
-    onClose,
-    values.branch,
-    acadYear,
-  ]);
+	const updateStudent = async () => {
+		try {
+			const formData = new FormData();
+			formData.append("id", values.id);
+			formData.append("usn", values.usn);
+			formData.append("name", values.name);
+			formData.append("phone", values.phone);
+			formData.append("category", values.category);
+			formData.append("state_category", values.state_category);
+			formData.append("sem", values.sem);
+			formData.append("branch", values.branch);
+			formData.append("college", user?.college!);
+			formData.append("total_fee", values.total.toString());
+			formData.append("status", values.status);
+			formData.append("paid", values.paid.toString());
+			formData.append("remaining", values.remaining.toString());
+			formData.append("acadyear", acadYear);
+			const response = await axios(
+				`${process.env.NEXT_PUBLIC_ADMIN_URL}studentupdate.php`,
+				{
+					method: "POST",
+					data: formData,
+				},
+			);
+			if (response?.status !== 201) throw Error("Something went wrong !");
+			toaster.success({ title: "Updated successfully" });
+			dispatch(
+				fetchFeeDetails({
+					branch: values.branch,
+					year: data[0].year,
+					college: user?.college!,
+				}),
+			);
+			router.refresh();
+			onClose();
+		} catch (e: any) {
+			toaster.error({ title: e.response.data?.msg });
+		}
+	};
 
-  const [amount, setAmount] = useState("0");
-  const [method, setMethod] = useState("");
-  const [challanId, setChallanId] = useState("");
-  const [tid, setTid] = useState("");
-  const [date, setDate] = useState("");
+	const deleteStudent = useCallback(async () => {
+		setIsDeleting(true);
+		try {
+			const formData = new FormData();
+			formData.append("id", values.id);
+			formData.append("usn", values.usn);
+			formData.append("college", user?.college!);
+			formData.append("acadyear", acadYear);
+			const response = await axios(
+				`${process.env.NEXT_PUBLIC_ADMIN_URL}studentdelete.php`,
+				{
+					method: "POST",
+					data: formData,
+				},
+			);
+			if (response?.status !== 201) throw Error("Something went wrong !");
+			toaster.info({ title: "Deleted successfully" });
+			dispatch(
+				fetchFeeDetails({
+					branch: values.branch,
+					year: data[0].year,
+					college: user?.college!,
+				}),
+			);
+			router.refresh();
+			onClose();
+			onClose();
+		} catch (e: any) {
+			toaster.error({ title: e.response.data?.msg });
+		}
+		setIsDeleting(false);
+	}, [
+		values.id,
+		values.usn,
+		user?.college,
+		data,
+		dispatch,
+		router,
+		onClose,
+		values.branch,
+		acadYear,
+	]);
 
-  const paymentUpdate = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("id", values.id);
-      formData.append("regno", values.usn);
-      formData.append("phone", values.phone);
-      formData.append("paid", amount);
-      formData.append("method", method);
-      formData.append("college", user?.college!);
-      formData.append("challan_id", challanId);
-      formData.append("tid", tid);
-      formData.append("date", moment(date).format("DD-MM-yyyy"));
-      formData.append("acadYear", acadYear);
-      formData.append("state_category", values.state_category);
-      formData.append("category", values.category);
+	const [amount, setAmount] = useState("0");
+	const [method, setMethod] = useState("");
+	const [challanId, setChallanId] = useState("");
+	const [tid, setTid] = useState("");
+	const [date, setDate] = useState("");
 
-      const response = await axios(
-        `${process.env.NEXT_PUBLIC_ADMIN_URL}studentupdatefee.php`,
-        {
-          method: "POST",
-          data: formData,
-        },
-      );
-      if (response?.status !== 201) throw Error("Something went wrong !");
-      toaster.success({ title: "Updated successfully" });
-      dispatch(
-        fetchFeeDetails({
-          branch: values.branch,
-          year: data[0].year,
-          college: user?.college!,
-        }),
-      );
-      router.refresh();
-      onPaymentClose();
-    } catch (e: any) {
-      toaster.error({ title: e.response.data?.msg });
-    }
-  };
+	const paymentUpdate = async () => {
+		try {
+			const formData = new FormData();
+			formData.append("id", values.id);
+			formData.append("regno", values.usn);
+			formData.append("phone", values.phone);
+			formData.append("paid", amount);
+			formData.append("method", method);
+			formData.append("college", user?.college!);
+			formData.append("challan_id", challanId);
+			formData.append("tid", tid);
+			formData.append("date", moment(date).format("DD-MM-yyyy"));
+			formData.append("acadYear", acadYear);
+			formData.append("state_category", values.state_category);
+			formData.append("category", values.category);
 
-  return (
-    <>
-      <IModal
-        heading="Payment Updation"
-        buttonTitle="Update"
-        size={"xl"}
-        open={isPaymentOpen}
-        onSubmit={paymentUpdate}
-        onClose={() => {
-          onPaymentClose();
-        }}
-        disabled={
-          !amount || !method || amount === "0" || !challanId || !date || !tid
-        }
-      >
-        <VStack>
-          <HStack>
-            <Heading size={"md"}>{values.name}</Heading>
-            <Heading size={"md"} color={"gray.500"}>
-              {values.usn}
-            </Heading>
-          </HStack>
-          <HStack>
-            <Tag.Root colorPalette="purple" size={"lg"}>
-              <Tag.Label>
-                {values.branch} - {values.sem} Sem
-              </Tag.Label>
-            </Tag.Root>
-            <Tag.Root colorPalette="purple" size={"lg"}>
-              <Tag.Label>{values.category}</Tag.Label>
-            </Tag.Root>
-          </HStack>
-          <SimpleGrid columns={2} gap={"3"}>
-            <Field.Root>
-              <Field.Label>Challan ID</Field.Label>
-              <Input
-                value={challanId}
-                onChange={(e) => setChallanId(e.target.value)}
-                type="text"
-              />
-            </Field.Root>
-            <Field.Root>
-              <Field.Label>Amount</Field.Label>
-              <Input
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                type="number"
-              />
-            </Field.Root>
-            <Field.Root>
-              <Field.Label>Payment Method</Field.Label>
-              <NativeSelect.Root>
-                <NativeSelect.Field
-                  value={method}
-                  onChange={(e) => setMethod(e.target.value)}
-                >
-                  <option value={""}>Select</option>
-                  <option value={"UPI_SCAN"}>UPI SCAN</option>
-                  <option value={"MANUAL_RECIEPT"}>MANUAL RECIEPT</option>
-                  <option value={"EASYPAY_PAYMENT"}>EASYPAY PAYMENT</option>
-                  <option value={"OTHERS"}>OTHERS</option>
-                </NativeSelect.Field>
-                <NativeSelect.Indicator />
-              </NativeSelect.Root>
-            </Field.Root>
-            <Field.Root>
-              <Field.Label>Transaction ID</Field.Label>
-              <Input
-                value={tid}
-                onChange={(e) => setTid(e.target.value)}
-                type="text"
-              />
-            </Field.Root>
-            <Field.Root>
-              <Field.Label>Payment Date</Field.Label>
-              <Input
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                type="date"
-              />
-            </Field.Root>
-          </SimpleGrid>
-        </VStack>
-      </IModal>
+			const response = await axios(
+				`${process.env.NEXT_PUBLIC_ADMIN_URL}studentupdatefee.php`,
+				{
+					method: "POST",
+					data: formData,
+				},
+			);
+			if (response?.status !== 201) throw Error("Something went wrong !");
+			toaster.success({ title: "Updated successfully" });
+			dispatch(
+				fetchFeeDetails({
+					branch: values.branch,
+					year: data[0].year,
+					college: user?.college!,
+				}),
+			);
+			router.refresh();
+			onPaymentClose();
+		} catch (e: any) {
+			toaster.error({ title: e.response.data?.msg });
+		}
+	};
 
-      <IDrawer
-        size={"sm"}
-        loading={isSubmitting}
-        disabled={!isValid}
-        onSubmit={() => {
-          handleSubmit();
-        }}
-        buttonTitle="Save"
-        onClose={() => {
-          setFormikState({
-            isSubmitting: false,
-            isValidating: false,
-            submitCount: 0,
-            values: initialState,
-            errors: {},
-            touched: {},
-            status: "",
-          });
-          onClose();
-        }}
-        open={open}
-        heading="Student Details"
-      >
-        {pending ? (
-          <VStack
-            h={"auto"}
-            py={"300px"}
-            w={"auto"}
-            alignContent={"center"}
-            alignItems={"center"}
-          >
-            <Spinner colorPalette="facebook" color="blue" size={"lg"} />
-          </VStack>
-        ) : (
-          <VStack
-            alignItems={"flex-start"}
-            py={"5"}
-            w={"full"}
-            h={"full"}
-            gap={"2"}
-            justifyContent={"start"}
-            position={"relative"}
-          >
-            {/* <pre>{JSON.stringify(values)}</pre> */}
-            <Field.Root invalid={!!errors.usn?.length && touched.usn} px={"5"}>
-              <Field.Label flex={1}>
-                <Text>USN</Text>
-              </Field.Label>
-              <Input
-                name="usn"
-                value={values.usn}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <Field.ErrorText>{errors.usn}</Field.ErrorText>
-            </Field.Root>
+	return (
+		<>
+			<IModal
+				heading="Payment Updation"
+				buttonTitle="Update"
+				size={"xl"}
+				open={isPaymentOpen}
+				onSubmit={paymentUpdate}
+				onClose={() => {
+					onPaymentClose();
+				}}
+				disabled={
+					!amount || !method || amount === "0" || !challanId || !date || !tid
+				}
+			>
+				<VStack>
+					<HStack>
+						<Heading size={"md"}>{values.name}</Heading>
+						<Heading size={"md"} color={"gray.500"}>
+							{values.usn}
+						</Heading>
+					</HStack>
+					<HStack>
+						<Tag.Root colorPalette="purple" size={"lg"}>
+							<Tag.Label>
+								{values.branch} - {values.sem} Sem
+							</Tag.Label>
+						</Tag.Root>
+						<Tag.Root colorPalette="purple" size={"lg"}>
+							<Tag.Label>{values.category}</Tag.Label>
+						</Tag.Root>
+					</HStack>
+					<SimpleGrid columns={2} gap={"3"}>
+						<Field.Root>
+							<Field.Label>Challan ID</Field.Label>
+							<Input
+								value={challanId}
+								onChange={(e) => setChallanId(e.target.value)}
+								type="text"
+							/>
+						</Field.Root>
+						<Field.Root>
+							<Field.Label>Amount</Field.Label>
+							<Input
+								value={amount}
+								onChange={(e) => setAmount(e.target.value)}
+								type="number"
+							/>
+						</Field.Root>
+						<Field.Root>
+							<Field.Label>Payment Method</Field.Label>
+							<NativeSelect.Root>
+								<NativeSelect.Field
+									value={method}
+									onChange={(e) => setMethod(e.target.value)}
+								>
+									<option value={""}>Select</option>
+									<option value={"UPI_SCAN"}>UPI SCAN</option>
+									<option value={"MANUAL_RECIEPT"}>MANUAL RECIEPT</option>
+									<option value={"EASYPAY_PAYMENT"}>EASYPAY PAYMENT</option>
+									<option value={"OTHERS"}>OTHERS</option>
+								</NativeSelect.Field>
+								<NativeSelect.Indicator />
+							</NativeSelect.Root>
+						</Field.Root>
+						<Field.Root>
+							<Field.Label>Transaction ID</Field.Label>
+							<Input
+								value={tid}
+								onChange={(e) => setTid(e.target.value)}
+								type="text"
+							/>
+						</Field.Root>
+						<Field.Root>
+							<Field.Label>Payment Date</Field.Label>
+							<Input
+								value={date}
+								onChange={(e) => setDate(e.target.value)}
+								type="date"
+							/>
+						</Field.Root>
+					</SimpleGrid>
+				</VStack>
+			</IModal>
 
-            <Field.Root
-              invalid={!!errors.name?.length && touched.name}
-              px={"5"}
-            >
-              <Field.Label flex={1}>
-                <Text>Name</Text>
-              </Field.Label>
-              <Input
-                name="name"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <Field.ErrorText>{errors.name}</Field.ErrorText>
-            </Field.Root>
+			<IDrawer
+				size={"sm"}
+				loading={isSubmitting}
+				disabled={!isValid}
+				onSubmit={() => {
+					handleSubmit();
+				}}
+				buttonTitle="Save"
+				onClose={() => {
+					setFormikState({
+						isSubmitting: false,
+						isValidating: false,
+						submitCount: 0,
+						values: initialState,
+						errors: {},
+						touched: {},
+						status: "",
+					});
+					onClose();
+				}}
+				open={open}
+				heading="Student Details"
+			>
+				{pending ? (
+					<VStack
+						h={"auto"}
+						py={"300px"}
+						w={"auto"}
+						alignContent={"center"}
+						alignItems={"center"}
+					>
+						<Spinner colorPalette="facebook" color="blue" size={"lg"} />
+					</VStack>
+				) : (
+					<VStack
+						alignItems={"flex-start"}
+						py={"5"}
+						w={"full"}
+						h={"full"}
+						gap={"2"}
+						justifyContent={"start"}
+						position={"relative"}
+					>
+						{/* <pre>{JSON.stringify(values)}</pre> */}
+						<Field.Root invalid={!!errors.usn?.length && touched.usn} px={"5"}>
+							<Field.Label flex={1}>
+								<Text>USN</Text>
+							</Field.Label>
+							<Input
+								name="usn"
+								value={values.usn}
+								onChange={handleChange}
+								onBlur={onFieldBlur}
+							/>
+							<Field.ErrorText>{errors.usn}</Field.ErrorText>
+						</Field.Root>
 
-            <Field.Root
-              invalid={!!errors.phone?.length && touched.phone}
-              px={"5"}
-            >
-              <Field.Label flex={1}>
-                <Text>Phone Number</Text>
-              </Field.Label>
-              <InputGroup startAddon={"+91"}>
-                <NumberInput.Root
-                  name="phone"
-                  w={"full"}
-                  value={values.phone}
-                  onChange={handleChange}
-                >
-                  <NumberInput.Input onBlur={handleBlur} />
-                </NumberInput.Root>
-              </InputGroup>
-              <Field.ErrorText>{errors.phone}</Field.ErrorText>
-            </Field.Root>
+						<Field.Root
+							invalid={!!errors.name?.length && touched.name}
+							px={"5"}
+						>
+							<Field.Label flex={1}>
+								<Text>Name</Text>
+							</Field.Label>
+							<Input
+								name="name"
+								value={values.name}
+								onChange={handleChange}
+								onBlur={onFieldBlur}
+							/>
+							<Field.ErrorText>{errors.name}</Field.ErrorText>
+						</Field.Root>
 
-            <Field.Root invalid={!!errors.sem?.length && touched.sem} px={"5"}>
-              <Field.Label flex={1}>
-                <Text>Sem</Text>
-              </Field.Label>
-              <NativeSelect.Root>
-                <NativeSelect.Field
-                  name="sem"
-                  value={values.sem}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                >
-                  <option value={""}>Select Sem</option>
-                  {SEMS(user?.college).map((value) => (
-                    <option value={value.value} key={value.value}>
-                      {value.option}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-                <NativeSelect.Indicator />
-              </NativeSelect.Root>
-              <Field.ErrorText>{errors.sem}</Field.ErrorText>
-            </Field.Root>
+						<Field.Root
+							invalid={!!errors.phone?.length && touched.phone}
+							px={"5"}
+						>
+							<Field.Label flex={1}>
+								<Text>Phone Number</Text>
+							</Field.Label>
+							<InputGroup startAddon={"+91"}>
+								<NumberInput.Root
+									name="phone"
+									w={"full"}
+									value={values.phone}
+									onChange={handleChange}
+								>
+									<NumberInput.Input name="phone" onBlur={onFieldBlur} />
+								</NumberInput.Root>
+							</InputGroup>
+							<Field.ErrorText>{errors.phone}</Field.ErrorText>
+						</Field.Root>
 
-            <Field.Root
-              invalid={!!errors.branch?.length && touched.branch}
-              px={"5"}
-            >
-              <Field.Label flex={1}>
-                <Text>Branch</Text>
-              </Field.Label>
-              <NativeSelect.Root>
-                <NativeSelect.Field
-                  name="branch"
-                  value={values.branch}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                >
-                  <option value={""}>Select Branch</option>
-                  {branch_list.map((branch: any, key) => (
-                    <option key={branch + key.toString()} value={branch.branch}>
-                      {branch.branch}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-              </NativeSelect.Root>
-              <Field.ErrorText>{errors.branch}</Field.ErrorText>
-            </Field.Root>
+						<Field.Root invalid={!!errors.sem?.length && touched.sem} px={"5"}>
+							<Field.Label flex={1}>
+								<Text>Sem</Text>
+							</Field.Label>
+							<NativeSelect.Root>
+								<NativeSelect.Field
+									name="sem"
+									value={values.sem}
+									onChange={handleChange}
+									onBlur={onFieldBlur}
+								>
+									<option value={""}>Select Sem</option>
+									{SEMS(user?.college).map((value) => (
+										<option value={value.value} key={value.value}>
+											{value.option}
+										</option>
+									))}
+								</NativeSelect.Field>
+								<NativeSelect.Indicator />
+							</NativeSelect.Root>
+							<Field.ErrorText>{errors.sem}</Field.ErrorText>
+						</Field.Root>
 
-            <Field.Root
-              invalid={!!errors.category?.length && touched.category}
-              px={"5"}
-            >
-              <Field.Label flex={1}>
-                <Text>Category</Text>
-              </Field.Label>
-              <NativeSelect.Root>
-                <NativeSelect.Field
-                  name="category"
-                  value={values.category}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                >
-                  <option value={""}>Select Category</option>
-                  {Categories.map((category, key) => (
-                    <option
-                      key={category.value + key.toString()}
-                      value={category.value}
-                    >
-                      {category.option}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-                <NativeSelect.Indicator />
-              </NativeSelect.Root>
-              <Field.ErrorText>{errors.category}</Field.ErrorText>
-            </Field.Root>
+						<Field.Root
+							invalid={!!errors.branch?.length && touched.branch}
+							px={"5"}
+						>
+							<Field.Label flex={1}>
+								<Text>Branch</Text>
+							</Field.Label>
+							<NativeSelect.Root>
+								<NativeSelect.Field
+									name="branch"
+									value={values.branch}
+									onChange={handleChange}
+									onBlur={onFieldBlur}
+								>
+									<option value={""}>Select Branch</option>
+									{branch_list.map((branch: any, key) => (
+										<option key={branch + key.toString()} value={branch.branch}>
+											{branch.branch}
+										</option>
+									))}
+								</NativeSelect.Field>
+							</NativeSelect.Root>
+							<Field.ErrorText>{errors.branch}</Field.ErrorText>
+						</Field.Root>
 
-            {user?.college === "KSDC" && (
-              <Field.Root
-                invalid={
-                  !!errors.state_category?.length && touched.state_category
-                }
-                px={"5"}
-              >
-                <Field.Label flex={1}>
-                  <Text>State Category</Text>
-                </Field.Label>
-                <NativeSelect.Root>
-                  <NativeSelect.Field
-                    name="state_category"
-                    value={values.state_category}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                  >
-                    <option value={""}>Select State Category</option>
-                    {stateCategories.map((category, key) => (
-                      <option
-                        key={category.value + key.toString()}
-                        value={category.value}
-                      >
-                        {category.option}
-                      </option>
-                    ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
-                <Field.ErrorText>{errors.state_category}</Field.ErrorText>
-              </Field.Root>
-            )}
+						<Field.Root
+							invalid={!!errors.category?.length && touched.category}
+							px={"5"}
+						>
+							<Field.Label flex={1}>
+								<Text>Category</Text>
+							</Field.Label>
+							<NativeSelect.Root>
+								<NativeSelect.Field
+									name="category"
+									value={values.category}
+									onChange={handleChange}
+									onBlur={onFieldBlur}
+								>
+									<option value={""}>Select Category</option>
+									{Categories.map((category, key) => (
+										<option
+											key={category.value + key.toString()}
+											value={category.value}
+										>
+											{category.option}
+										</option>
+									))}
+								</NativeSelect.Field>
+								<NativeSelect.Indicator />
+							</NativeSelect.Root>
+							<Field.ErrorText>{errors.category}</Field.ErrorText>
+						</Field.Root>
 
-            <Field.Root
-              invalid={!!errors.total?.length && touched.total}
-              px={"5"}
-            >
-              <Field.Label flex={1}>
-                <Text>Total Amount</Text>
-              </Field.Label>
-              <Input
-                name="total"
-                value={values.total}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <Field.ErrorText>{errors.total}</Field.ErrorText>
-            </Field.Root>
+						{user?.college === "KSDC" && (
+							<Field.Root
+								invalid={
+									!!errors.state_category?.length && touched.state_category
+								}
+								px={"5"}
+							>
+								<Field.Label flex={1}>
+									<Text>State Category</Text>
+								</Field.Label>
+								<NativeSelect.Root>
+									<NativeSelect.Field
+										name="state_category"
+										value={values.state_category}
+										onChange={handleChange}
+										onBlur={onFieldBlur}
+									>
+										<option value={""}>Select State Category</option>
+										{stateCategories.map((category, key) => (
+											<option
+												key={category.value + key.toString()}
+												value={category.value}
+											>
+												{category.option}
+											</option>
+										))}
+									</NativeSelect.Field>
+									<NativeSelect.Indicator />
+								</NativeSelect.Root>
+								<Field.ErrorText>{errors.state_category}</Field.ErrorText>
+							</Field.Root>
+						)}
 
-            <Field.Root px={"5"}>
-              <Field.Label flex={1}>
-                <Text>Paid Amount</Text>
-              </Field.Label>
-              <Input
-                name="paid"
-                value={values.paid}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <Field.ErrorText>{errors.total}</Field.ErrorText>
-            </Field.Root>
+						<Field.Root
+							invalid={!!errors.total?.length && touched.total}
+							px={"5"}
+						>
+							<Field.Label flex={1}>
+								<Text>Total Amount</Text>
+							</Field.Label>
+							<Input
+								name="total"
+								value={values.total}
+								onChange={handleChange}
+								onBlur={onFieldBlur}
+							/>
+							<Field.ErrorText>{errors.total}</Field.ErrorText>
+						</Field.Root>
 
-            <Field.Root px={"5"}>
-              <Field.Label flex={1}>
-                <Text>Balance Amount</Text>
-              </Field.Label>
-              <Input
-                name="remaining"
-                value={values.remaining}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-            </Field.Root>
+						<Field.Root
+							invalid={!!errors.paid?.length && touched.paid}
+							px={"5"}
+						>
+							<Field.Label flex={1}>
+								<Text>Paid Amount</Text>
+							</Field.Label>
+							<Input
+								name="paid"
+								value={values.paid}
+								onChange={handleChange}
+								onBlur={onFieldBlur}
+							/>
+							<Field.ErrorText>{errors.paid}</Field.ErrorText>
+						</Field.Root>
 
-            <Field.Root readOnly px={"5"}>
-              <Field.Label flex={1}>
-                <Text>Status</Text>
-              </Field.Label>
-              <Input
-                readOnly
-                name="status"
-                value={values.status}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-            </Field.Root>
+						<Field.Root px={"5"}>
+							<Field.Label flex={1}>
+								<Text>Balance Amount</Text>
+							</Field.Label>
+							<Input
+								name="remaining"
+								value={values.remaining}
+								onChange={handleChange}
+								onBlur={onFieldBlur}
+							/>
+						</Field.Root>
 
-            <VStack
-              position={"sticky"}
-              backdropFilter={"blur(5px)"}
-              bottom={"0"}
-              w={"full"}
-              p={"5"}
-            >
-              {values.id && (
-                <>
-                  {values.remaining < 0 && (
-                    <Alert.Root status="warning">
-                      <Alert.Indicator />
-                      <Box>
-                        <Alert.Title fontSize={"small"}>Warning !</Alert.Title>
-                        <Alert.Description fontSize={"smaller"}>
-                          Remaining Amount is less than zero. You still may
-                          continue to save the changes.
-                        </Alert.Description>
-                      </Box>
-                    </Alert.Root>
-                  )}
-                  <Button
-                    disabled={isSubmitting || !isValid}
-                    onClick={onPaymentOpen}
-                    w={"full"}
-                    colorPalette={"purple"}
-                    variant={"surface"}
-                  >
-                    Update Payment
-                  </Button>
-                  <Button
-                    loading={isDeleting}
-                    onClick={() => deleteStudent()}
-                    w={"full"}
-                    colorPalette="red"
-                  >
-                    <AiOutlineUserDelete />
-                    Remove
-                  </Button>
-                </>
-              )}
-            </VStack>
-          </VStack>
-        )}
-      </IDrawer>
-      {children({ onOpen })}
-    </>
-  );
+						<Field.Root readOnly px={"5"}>
+							<Field.Label flex={1}>
+								<Text>Status</Text>
+							</Field.Label>
+							<Input
+								readOnly
+								name="status"
+								value={values.status}
+								onChange={handleChange}
+								onBlur={onFieldBlur}
+							/>
+						</Field.Root>
+
+						<VStack
+							position={"sticky"}
+							backdropFilter={"blur(5px)"}
+							bottom={"0"}
+							w={"full"}
+							p={"5"}
+						>
+							{values.id && (
+								<>
+									{values.remaining < 0 && (
+										<Alert.Root status="warning">
+											<Alert.Indicator />
+											<Box>
+												<Alert.Title fontSize={"small"}>Warning !</Alert.Title>
+												<Alert.Description fontSize={"smaller"}>
+													Remaining Amount is less than zero. You still may
+													continue to save the changes.
+												</Alert.Description>
+											</Box>
+										</Alert.Root>
+									)}
+									<Button
+										disabled={isSubmitting || !isValid}
+										onClick={onPaymentOpen}
+										w={"full"}
+										colorPalette={"purple"}
+										variant={"surface"}
+									>
+										Update Payment
+									</Button>
+									<Button
+										loading={isDeleting}
+										onClick={() => deleteStudent()}
+										w={"full"}
+										colorPalette="red"
+									>
+										<AiOutlineUserDelete />
+										Remove
+									</Button>
+								</>
+							)}
+						</VStack>
+					</VStack>
+				)}
+			</IDrawer>
+			{children({ onOpen })}
+		</>
+	);
 }
