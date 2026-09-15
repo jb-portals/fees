@@ -1190,7 +1190,7 @@ export function WithUSNPage() {
 						)
 						.join("&")}&paymentType=${paymentType}&college=${
 						user?.college
-					}&mutable=${isMutable}`,
+					}&mutable=${isMutable}&with_usn=YES`,
 			);
 
 			if (response.status === 402) return new Error(response.data.msg);
@@ -1208,7 +1208,7 @@ export function WithUSNPage() {
 						)
 						.join("&")}&paymentType=${paymentType}&college=${
 						user?.college
-					}&mutable=${isMutable}`,
+					}&mutable=${isMutable}&with_usn=YES`,
 				"_blank",
 			);
 		} catch (e: any) {

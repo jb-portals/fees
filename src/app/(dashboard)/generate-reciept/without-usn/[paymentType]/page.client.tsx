@@ -1128,7 +1128,7 @@ export function WithoutUSNPage() {
 						)
 						.join("&")}&paymentType=${paymentType}&college=${
 						user?.college
-					}&auto_add=${isAutoAddEnabled}&acadYear=${acadYear}`,
+					}&auto_add=${isAutoAddEnabled}&acadYear=${acadYear}&with_usn=NO`,
 			);
 			const link = document.createElement("a");
 			link.href =
@@ -1144,7 +1144,7 @@ export function WithoutUSNPage() {
 					)
 					.join("&")}&paymentType=${paymentType}&college=${
 					user?.college
-				}&auto_add=${isAutoAddEnabled}&acadYear=${acadYear}`;
+				}&auto_add=${isAutoAddEnabled}&acadYear=${acadYear}&with_usn=NO`;
 			link.setAttribute("download", "Fee Reciept Offline.pdf");
 			link.setAttribute("target", "_blank");
 			document.body.appendChild(link);
